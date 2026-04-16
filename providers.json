@@ -1,0 +1,64 @@
+{
+  "§": "P",
+  "name": "ACG · provider registry",
+  "desc": "One row per subsystem directory. Each row points at the Jython 2.7 provider module plus its declarative UDT + tag catalogs.  The browser runtime at /js/scada/providers.js mirrors this list.",
+
+  "runtime": {
+    "jython":  "2.7",
+    "browser": "ES modules",
+    "bridge":  "BroadcastChannel('acg-mesh')"
+  },
+
+  "subsystems": [
+    {
+      "id": "💬 chat",
+      "dir": "chat/",
+      "provider": "chat/provider.py",
+      "udts": "chat/udts.json",
+      "tags": "chat/tags.json",
+      "browser": ["js/config.js", "js/p2p.js", "js/peers.js", "js/chat.js"],
+      "namespaces": ["chat", "room", "tracker", "peers", "signal"]
+    },
+    {
+      "id": "🔑 auth",
+      "dir": "auth/",
+      "provider": "auth/provider.py",
+      "udts": "auth/udts.json",
+      "tags": "auth/tags.json",
+      "browser": ["js/auth.js"],
+      "namespaces": ["auth"]
+    },
+    {
+      "id": "⚠ errors",
+      "dir": "errors/",
+      "provider": "errors/provider.py",
+      "udts": "errors/udts.json",
+      "tags": "errors/tags.json",
+      "browser": ["js/errors.js"],
+      "viewer": "gateway-log.html",
+      "namespaces": ["errors"]
+    },
+    {
+      "id": "🖥️ scada",
+      "dir": "controls/scada/",
+      "provider": "controls/scada/provider.py",
+      "udts":     "controls/scada/udts.json",
+      "tags":     "controls/scada/tags.json",
+      "specs":    ["controls/scada/00-legend.json", "controls/scada/01-master.json", "controls/scada/02-chat.json", "controls/scada/03-scada.json", "controls/scada/04-sandbox.json"],
+      "programs": "controls/scada/programs/",
+      "browser":  ["js/scada/tags.js", "js/scada/providers.js", "js/scada/monitor.js", "js/scada/udt.js"],
+      "namespaces": ["sys", "version"]
+    },
+    {
+      "id": "🧪 sandbox",
+      "dir": "sandbox/",
+      "provider": "sandbox/provider.py",
+      "udts": "sandbox/udts.json",
+      "tags": "sandbox/tags.json",
+      "browser": ["js/sandbox-bridge.js", "sandbox/shared/mesh-bridge.js", "sandbox/**"],
+      "namespaces": ["sandbox"]
+    }
+  ],
+
+  "和": true
+}

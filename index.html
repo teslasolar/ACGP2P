@@ -4,53 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>⚒ ACG P2P · AI Craftspeople Guild</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
-:root{--bg:#faf6f0;--bg2:#f5ede0;--card:#fff;--inp:#faf6f0;--tx:#1a2332;--dm:#5a6672;--ft:#8d95a0;--tl:#1a5c4c;--tl2:#2d7a68;--tlb:#e8f4f0;--am:#c47a20;--amb:#fdf2e0;--sg:#4a8868;--sgb:#e8f2ec;--rs:#b85c5c;--rsb:#fce8e8;--bd:#e4ddd0;--bd2:#ede8de;--sh:rgba(40,30,15,.08)}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'DM Sans',system-ui,sans-serif;background:linear-gradient(135deg,#faf6f0,#f0e8d8 50%,#f5ece0);color:var(--tx);height:100vh;display:flex;flex-direction:column;overflow:hidden}
-.hd{padding:12px 20px;background:var(--card);border-bottom:1px solid var(--bd);box-shadow:0 1px 3px var(--sh);display:flex;align-items:center;gap:14px;flex-wrap:wrap;z-index:10}
-.hd h1{font-family:'Source Serif 4',serif;font-weight:700;font-size:17px}.hd h1 span{font-weight:400;color:var(--dm);font-size:13px;margin-left:6px}
-.bg{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600}.bg.t{background:var(--tlb);color:var(--tl)}.bg.s{background:var(--sgb);color:var(--sg)}.bg.a{background:var(--amb);color:var(--am)}.bg.r{background:var(--rsb);color:var(--rs)}
-.ri{display:flex;gap:6px;align-items:center}.ri label{font-size:11px;color:var(--dm);font-weight:500}.ri input{padding:5px 10px;background:var(--inp);border:1px solid var(--bd);border-radius:8px;color:var(--tx);font-family:'JetBrains Mono',monospace;font-size:11px;width:130px;outline:none}.ri input:focus{border-color:var(--tl)}
-.bt{padding:5px 12px;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s}.bt.p{background:var(--tl);color:#fff}.bt.p:hover{background:var(--tl2)}.bt.g{background:var(--inp);color:var(--dm);border:1px solid var(--bd)}.bt.g:hover{border-color:var(--tl);color:var(--tl)}
-.st{display:flex;gap:14px;margin-left:auto;font-size:11px;align-items:center}.si{display:flex;align-items:center;gap:4px;color:var(--dm)}.sv{color:var(--tl);font-weight:700}
-.dt{width:8px;height:8px;border-radius:50%}.dt.on{background:var(--sg);box-shadow:0 0 6px var(--sg)}.dt.try{background:var(--am);animation:pu 1s infinite}.dt.off{background:#ccc}
-@keyframes pu{50%{opacity:.4}}
-.mn{flex:1;display:grid;grid-template-columns:1fr 260px;gap:12px;padding:12px 20px;overflow:hidden}
-.pn{background:var(--card);border:1px solid var(--bd);border-radius:12px;box-shadow:0 2px 8px var(--sh);display:flex;flex-direction:column;overflow:hidden}
-.ph{padding:10px 14px;border-bottom:1px solid var(--bd2);font-family:'Source Serif 4',serif;font-weight:600;font-size:13px;display:flex;align-items:center;gap:8px}
-.ph .ic{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;font-size:13px}
-.ph .ic.t{background:var(--tlb)}.ph .ic.s{background:var(--sgb)}
-.ph .ct{margin-left:auto;font-family:'DM Sans';font-size:10px;color:var(--ft);font-weight:500}
-.ca{flex:1;overflow-y:auto;padding:14px}.ca::-webkit-scrollbar{width:4px}.ca::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
-.ms{margin-bottom:10px;display:flex;flex-direction:column}.ms.me{align-items:flex-end}
-.mm{font-size:10px;color:var(--ft);margin-bottom:3px;font-weight:500}
-.mb{display:inline-block;max-width:75%;padding:9px 13px;border-radius:12px;font-size:13px;line-height:1.5;word-wrap:break-word}
-.ms:not(.me) .mb{background:var(--bg2);border:1px solid var(--bd2);border-bottom-left-radius:4px}
-.ms.me .mb{background:var(--tl);color:#fff;border-bottom-right-radius:4px}
-.mb.sy{background:none!important;border:none!important;color:var(--ft)!important;font-style:italic;font-size:11px;padding:3px 0}
-.cb{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--bd2)}
-.cb input{flex:1;padding:9px 13px;background:var(--inp);border:1px solid var(--bd);border-radius:10px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:13px;outline:none}
-.cb input:focus{border-color:var(--tl)}
-#log{max-height:120px;overflow-y:auto;padding:8px 10px;background:#1c2128;font-family:'JetBrains Mono',monospace;font-size:10px;line-height:1.6;color:#8b949e;border-radius:0 0 12px 12px}
-#log::-webkit-scrollbar{width:3px}#log::-webkit-scrollbar-thumb{background:#444}
-.lg{margin-bottom:1px}.ok{color:#7ee787}.hi{color:#79c0ff}.er{color:#f85149}.wr{color:#e3b341}
-.sb{display:flex;flex-direction:column;gap:10px}
-.pl{flex:1;overflow-y:auto;padding:8px}
-.pc{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:8px;margin-bottom:3px}.pc:hover{background:var(--bg2)}.pc.me{background:var(--tlb)}
-.pa{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:14px;background:var(--bg2);border:1px solid var(--bd)}.pc.me .pa{background:var(--tlb);border-color:var(--tl)}
-.pn2{font-size:11px;font-weight:500}.pn2 small{display:block;font-size:9px;color:var(--ft);font-weight:400}
-.ib{padding:12px 14px}.ib h3{font-family:'Source Serif 4',serif;font-weight:600;font-size:12px;margin-bottom:6px}.ib p{font-size:10px;color:var(--dm);line-height:1.5;margin-bottom:8px}.ib a{display:block;text-align:center;padding:6px;border:1px solid var(--bd);border-radius:8px;color:var(--tl);text-decoration:none;font-size:11px;font-weight:500}.ib a:hover{background:var(--tlb);border-color:var(--tl)}
-.ftr{padding:6px 20px;background:var(--card);border-top:1px solid var(--bd);font-size:9px;color:var(--ft);display:flex;justify-content:space-between}.ftr a{color:var(--tl);text-decoration:none}
-@media(max-width:800px){.mn{grid-template-columns:1fr}.sb{display:none}.hd{flex-direction:column;align-items:flex-start;gap:8px}.st{margin-left:0}}
-</style>
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <div class="hd">
   <h1>⚒ ACG P2P<span>· guild mesh</span></h1>
   <span class="bg t">WebRTC</span>
   <span class="bg a" id="cBg">Connecting</span>
+  <a class="bg v" id="ver" href="https://github.com/teslasolar/ACGP2P" target="_blank" rel="noopener" title="loading…">⌖ …</a>
+  <a class="bg sc" href="controls/" title="Control plane · SCADA, alarms, routing (Ctrl+. toggles the SCADA drawer)">🎛 Controls</a>
+  <a class="bg sx" href="sandbox/index.html" title="Sandbox tools (WebLLM, …)">⌂ Sandbox</a>
+  <a class="bg lg" href="gateway-log.html" title="Gateway log · errors.*">⚠ Log</a>
+  <a class="bg hc" href="health.html" title="Health check · trackers, STUN, GitHub API">⚕ Health</a>
+  <a class="bg ix" href="index/" title="Subsystem directory · one index page per subsystem">🗂 Directory</a>
   <div class="ri">
     <label>Room</label>
     <input type="text" id="rIn" value="acg-guild">
@@ -59,6 +25,7 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:linear-gradient(135de
   <div class="st">
     <div class="si"><span class="dt try" id="dot"></span><span id="cTx">Connecting</span></div>
     <div class="si">👥 <span class="sv" id="nP">1</span></div>
+    <div class="si" id="auth"></div>
   </div>
 </div>
 <div class="mn">
@@ -87,264 +54,6 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:linear-gradient(135de
 </div>
 <div class="ftr"><span>⚒ AI Craftspeople Guild · P2P</span><span><a href="https://github.com/aicraftspeopleguild" target="_blank">github.com/aicraftspeopleguild</a></span></div>
 
-<script>
-const $=id=>document.getElementById(id);
-const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-
-/* ═══ MULTI-TRACKER with auto-fallback ═══ */
-const TRACKERS=[
-  'wss://tracker.openwebtorrent.com',
-  'wss://tracker.btorrent.xyz',
-  'wss://tracker.webtorrent.dev',
-  'wss://tracker.fastcast.nz',
-];
-let trackerIdx=0;
-
-const ICE={iceServers:[
-  {urls:'stun:stun.l.google.com:19302'},
-  {urls:'stun:stun1.l.google.com:19302'},
-  {urls:'stun:stun2.l.google.com:19302'},
-]};
-const N_OFFERS=10;
-
-// 20 bytes exactly: '-ACG001-' (8) + 6 random bytes hex (12) = 20
-const myId='-ACG001-'+Array.from(crypto.getRandomValues(new Uint8Array(6))).map(b=>b.toString(16).padStart(2,'0')).join('');
-const myNm=myId.slice(-8);
-const myEm=['⚒️','🔨','🛠️','⚙️','🔧','📐','🧬','🛡️'][parseInt(myId.slice(-2),16)%8];
-$('mId').textContent=myNm;
-
-let ws=null,hash=null,room='',reTimer=null;
-const pm=new Map();
-const pending=new Map();
-
-function log(t,c=''){const d=document.createElement('div');d.className='lg '+c;d.textContent=t;$('log').appendChild(d);$('log').scrollTop=$('log').scrollHeight;while($('log').children.length>50)$('log').removeChild($('log').firstChild)}
-
-function addMsg(pid,nm,em,txt,sys=false){
-  const me=pid===myId;const d=document.createElement('div');d.className='ms'+(me?' me':'');
-  if(sys)d.innerHTML=`<div class="mb sy">${esc(txt)}</div>`;
-  else d.innerHTML=`<div class="mm">${esc(em)} ${esc(nm)}</div><div class="mb">${esc(txt)}</div>`;
-  $('chat').appendChild(d);$('chat').scrollTop=$('chat').scrollHeight;
-}
-
-function updPeers(){
-  const el=$('pList');el.innerHTML='';
-  const s=document.createElement('div');s.className='pc me';
-  s.innerHTML=`<div class="pa">${esc(myEm)}</div><div class="pn2">${esc(myNm)}<small>you</small></div>`;
-  el.appendChild(s);
-  let n=0;
-  for(const[,info]of pm){if(info.dcs.size===0)continue;n++;
-    const c=document.createElement('div');c.className='pc';
-    c.innerHTML=`<div class="pa">${esc(info.emoji)}</div><div class="pn2">${esc(info.name)}</div>`;
-    el.appendChild(c);
-  }
-  $('nP').textContent=n+1;$('pLb').textContent=(n+1)+' online';
-}
-
-function bcast(msg){
-  const d=JSON.stringify(msg);let n=0;
-  for(const[,info]of pm)for(const dc of info.dcs)if(dc.readyState==='open'){try{dc.send(d);n++}catch(e){}}
-  return n;
-}
-
-async function mkHash(name){
-  const buf=await crypto.subtle.digest('SHA-1',new TextEncoder().encode('acg:'+name));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
-
-/* ═══ DATA CHANNEL ═══ */
-function wire(dc,rid){
-  dc.binaryType='arraybuffer';
-  dc.onopen=()=>{
-    log('✓ channel open → '+rid.slice(-8),'ok');
-    if(!pm.has(rid))pm.set(rid,{name:rid.slice(-8),emoji:'⚒️',dcs:new Set()});
-    pm.get(rid).dcs.add(dc);updPeers();
-    addMsg(null,null,null,'⚒️ '+rid.slice(-8)+' connected',true);
-    try{dc.send(JSON.stringify({t:'hi',id:myId,nm:myNm,em:myEm}))}catch(e){}
-  };
-  dc.onclose=()=>{
-    if(pm.has(rid)){const info=pm.get(rid);info.dcs.delete(dc);
-      if(info.dcs.size===0){addMsg(null,null,null,info.emoji+' '+info.name+' left',true);pm.delete(rid)}}
-    updPeers();
-  };
-  dc.onerror=e=>log('dc err: '+rid.slice(-8),'er');
-  dc.onmessage=e=>{try{
-    const m=JSON.parse(e.data);
-    if(m.t==='hi'){
-      const pid=m.id||rid;
-      if(!pm.has(pid))pm.set(pid,{name:m.nm||pid.slice(-8),emoji:m.em||'⚒️',dcs:new Set()});
-      const info=pm.get(pid);info.name=m.nm||info.name;info.emoji=m.em||info.emoji;info.dcs.add(dc);updPeers();
-    }else if(m.t==='msg'){
-      const pid=m.id||rid;const info=pm.get(pid)||{name:pid.slice(-8),emoji:'⚒️'};
-      addMsg(pid,info.name,info.emoji,m.txt);
-    }
-  }catch(er){log('parse err','er')}};
-}
-
-/* ═══ ICE + OFFER GENERATION ═══ */
-function waitIce(pc,ms=4000){
-  return new Promise(r=>{
-    if(pc.iceGatheringState==='complete')return r();
-    const t=setTimeout(r,ms);
-    pc.onicegatheringstatechange=()=>{if(pc.iceGatheringState==='complete'){clearTimeout(t);r()}};
-  });
-}
-
-async function mkOffers(n){
-  const offers=[];
-  for(let i=0;i<n;i++){
-    const oid=crypto.randomUUID();
-    const pc=new RTCPeerConnection(ICE);
-    const dc=pc.createDataChannel('acg',{ordered:true});
-    wire(dc,oid);
-    const offer=await pc.createOffer();
-    await pc.setLocalDescription(offer);
-    await waitIce(pc);
-    offers.push({offer_id:oid,offer:{type:'offer',sdp:pc.localDescription.sdp}});
-    pending.set(oid,pc);
-  }
-  return offers;
-}
-
-async function onOffer(msg){
-  const rid=msg.peer_id;
-  log('← offer from '+rid.slice(-8),'hi');
-  const pc=new RTCPeerConnection(ICE);
-  pc.ondatachannel=e=>wire(e.channel,rid);
-  try{
-    await pc.setRemoteDescription(msg.offer);
-    const ans=await pc.createAnswer();
-    await pc.setLocalDescription(ans);
-    await waitIce(pc);
-    ws.send(JSON.stringify({
-      action:'announce',info_hash:hash,peer_id:myId,
-      to_peer_id:rid,answer:{type:'answer',sdp:pc.localDescription.sdp},offer_id:msg.offer_id
-    }));
-    log('→ answer to '+rid.slice(-8),'ok');
-  }catch(e){log('offer handling failed: '+e.message,'er')}
-}
-
-async function onAnswer(msg){
-  const pc=pending.get(msg.offer_id);
-  if(!pc){log('unknown offer_id','wr');return}
-  log('← answer for '+msg.offer_id.slice(0,8),'hi');
-  try{await pc.setRemoteDescription(msg.answer)}catch(e){log('answer err: '+e.message,'er')}
-}
-
-async function announce(){
-  if(!ws||ws.readyState!==1)return;
-  log('announcing '+N_OFFERS+' offers','hi');
-  const offers=await mkOffers(N_OFFERS);
-  ws.send(JSON.stringify({
-    action:'announce',info_hash:hash,peer_id:myId,
-    numwant:50,uploaded:0,downloaded:0,left:1,offers
-  }));
-  log('✓ announced','ok');
-}
-
-/* ═══ CONNECT TO TRACKER (with fallback chain) ═══ */
-function connectTracker(trackerUrl){
-  return new Promise((resolve,reject)=>{
-    log('trying: '+trackerUrl,'hi');
-    const sock=new WebSocket(trackerUrl);
-    const timeout=setTimeout(()=>{
-      sock.onopen=null;sock.onerror=null;sock.onclose=null;
-      try{sock.close()}catch(e){}
-      reject(new Error('timeout'));
-    },6000);
-
-    sock.onopen=()=>{clearTimeout(timeout);resolve(sock)};
-    sock.onerror=()=>{clearTimeout(timeout);reject(new Error('connection failed'))};
-  });
-}
-
-async function join(rName){
-  if(ws){ws.onclose=null;ws.onerror=null;try{ws.close()}catch(e){}}
-  if(reTimer)clearTimeout(reTimer);
-  pending.clear();
-  for(const[,info]of pm)for(const dc of info.dcs)try{dc.close()}catch(e){}
-  pm.clear();updPeers();
-
-  room=rName;hash=await mkHash(rName);
-  log('room: '+rName+' hash: '+hash.slice(0,12)+'...','hi');
-  $('dot').className='dt try';$('cTx').textContent='Connecting';
-  $('cBg').textContent='Connecting';$('cBg').className='bg a';
-
-  // try each tracker until one connects
-  let connected=false;
-  for(let attempt=0;attempt<TRACKERS.length;attempt++){
-    const url=TRACKERS[(trackerIdx+attempt)%TRACKERS.length];
-    try{
-      ws=await connectTracker(url);
-      trackerIdx=(trackerIdx+attempt)%TRACKERS.length; // remember which worked
-      log('✓ connected to '+url,'ok');
-      connected=true;
-
-      $('dot').className='dt on';$('cTx').textContent='Connected';
-      $('cBg').textContent='Connected';$('cBg').className='bg s';
-      addMsg(null,null,null,'Connected to room: '+rName+' via '+url.split('/')[2],true);
-
-      ws.onmessage=async e=>{
-        try{
-          const m=JSON.parse(e.data);
-          if(m.offer&&m.peer_id&&m.peer_id!==myId)await onOffer(m);
-          if(m.answer&&m.offer_id)await onAnswer(m);
-          if(m.interval){
-            const sec=Math.min(m.interval,30);
-            if(reTimer)clearTimeout(reTimer);
-            reTimer=setTimeout(()=>announce(),sec*1000);
-          }
-        }catch(er){log('msg err: '+er.message,'er')}
-      };
-
-      ws.onclose=()=>{
-        log('tracker disconnected — retrying in 3s','wr');
-        $('dot').className='dt try';$('cTx').textContent='Reconnecting';
-        $('cBg').textContent='Reconnecting';$('cBg').className='bg a';
-        setTimeout(()=>join(room),3000);
-      };
-
-      ws.onerror=()=>{
-        log('tracker ws error','er');
-      };
-
-      // initial announce
-      await announce();
-      break;
-
-    }catch(e){
-      log('✗ '+url+' — '+e.message,'er');
-    }
-  }
-
-  if(!connected){
-    log('all trackers failed — retrying in 5s','er');
-    $('dot').className='dt off';$('cTx').textContent='No tracker';
-    $('cBg').textContent='Offline';$('cBg').className='bg r';
-    setTimeout(()=>join(room),5000);
-  }
-}
-
-function send(){
-  const txt=$('cIn').value.trim();if(!txt)return;
-  $('cIn').value='';
-  const n=bcast({t:'msg',id:myId,txt});
-  addMsg(myId,myNm,myEm,txt);
-  if(n>0)log('→ sent to '+n+' peer(s)','ok');
-  else log('→ no peers connected yet','wr');
-}
-
-$('jBtn').onclick=()=>join($('rIn').value.trim()||'acg-guild');
-$('cIn').onkeydown=e=>{if(e.key==='Enter')send()};
-$('sBtn').onclick=send;
-
-log('⚒ ACG P2P Mesh v1.1','hi');
-log('peer: '+myId+' (20 bytes ✓)','hi');
-log('trackers: '+TRACKERS.length+' with auto-fallback','hi');
-updPeers();
-setTimeout(()=>join($('rIn').value.trim()||'acg-guild'),300);
-
-// periodic re-announce
-setInterval(()=>{if(ws&&ws.readyState===1)announce()},30000);
-</script>
+<script type="module" src="js/main.js"></script>
 </body>
 </html>
