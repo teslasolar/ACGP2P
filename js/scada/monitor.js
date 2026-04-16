@@ -79,18 +79,34 @@ function updFooter(){
 
 export function toggle(){hidden?open():close()}
 
-export function open(){
+export function open(sync=true){
   hidden=false;panel.classList.add('open');
   if(!off)off=tags.subscribe('**',schedule);
   render();updFooter();
+  if(sync&&!location.hash.startsWith('#scada'))history.replaceState(null,'','#scada');
 }
 
-export function close(){
+export function close(sync=true){
   hidden=true;panel.classList.remove('open');
   if(off){off();off=null}
+  if(sync&&location.hash.startsWith('#scada'))history.replaceState(null,'',location.pathname+location.search);
+}
+
+function applyHash(){
+  const h=location.hash;
+  if(h==='#scada'||h.startsWith('#scada?')||h.startsWith('#scada/')){
+    // optional filter syntax: #scada?tracker  or  #scada/tracker
+    const q=h.slice(6).replace(/^[?\/]/,'');
+    open(false);
+    if(q&&filterIn){filterIn.value=decodeURIComponent(q);render()}
+  }else if(!hidden){
+    close(false);
+  }
 }
 
 export function startMonitor(){
   mount();
   setInterval(()=>{if(!hidden){render();updFooter()}},1000);
+  window.addEventListener('hashchange',applyHash);
+  applyHash();
 }
