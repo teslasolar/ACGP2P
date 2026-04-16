@@ -1,8 +1,45 @@
 /* ═══ ACG subsystem-index theme ═══ */
 @import url('../css/theme.css');
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{min-height:100%;background:linear-gradient(135deg,#faf6f0,#f0e8d8 50%,#f5ece0);color:var(--tx);font-family:var(--ff-body);font-size:13px}
-body>main{max-width:960px;margin:0 auto;padding:18px 20px 40px}
+html,body{height:100vh;overflow:hidden;background:linear-gradient(135deg,#faf6f0,#f0e8d8 50%,#f5ece0);color:var(--tx);font-family:var(--ff-body);font-size:13px}
+
+/* ─── NESW dock shell ─── */
+.dock-shell{display:grid;grid-template-areas:"n n n" "w m e" "s s s";grid-template-rows:auto 1fr auto;grid-template-columns:220px 1fr 260px;height:100vh;gap:1px;background:var(--bd)}
+.dock-n{grid-area:n;background:var(--card);display:flex;align-items:center;gap:14px;padding:12px 20px;border-bottom:1px solid var(--bd);box-shadow:0 1px 3px var(--sh);flex-wrap:wrap;min-height:54px}
+.dock-n-logo{font-family:var(--ff-display);font-weight:700;font-size:18px;letter-spacing:.3px;color:var(--tx)}
+.dock-n-logo span{font-size:12px;color:var(--dm);font-weight:400;margin-left:6px}
+.dock-n-shell{margin-left:auto;display:flex;gap:4px;flex-wrap:wrap}
+.dock-n-shell a{color:var(--tl);text-decoration:none;font-size:11px;font-weight:500;padding:5px 12px;border-radius:var(--r-sm);border:1px solid transparent}
+.dock-n-shell a:hover{background:var(--tlb);border-color:var(--tl)}
+
+.dock-w{grid-area:w;background:var(--card);padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+.dock-w-nav{display:flex;flex-direction:column;gap:4px}
+.dock-w-nav a{padding:6px 10px;border-radius:var(--r-sm);background:var(--bg);border:1px solid var(--bd);color:var(--dm);font-size:11px;font-weight:600;text-decoration:none;font-family:var(--ff-mono)}
+.dock-w-nav a:hover{border-color:var(--tl);color:var(--tl);background:var(--card)}
+.dock-w-nav a.on{background:var(--tlb);border-color:var(--tl);color:var(--tl)}
+.dock-w h4{font-family:var(--ff-display);font-size:11px;color:var(--ft);text-transform:uppercase;letter-spacing:1px;margin:6px 0 4px;font-weight:600}
+.dock-sep{border:none;border-top:1px solid var(--bd2);margin:8px 0}
+.dock-w-actions{display:flex;flex-direction:column;gap:4px}
+.dock-w-actions a{padding:6px 10px;border-radius:var(--r-sm);border:1px solid var(--bd);background:var(--inp);color:var(--dm);font-size:11px;text-decoration:none;font-family:var(--ff-body);font-weight:600}
+.dock-w-actions a:hover{border-color:var(--tl);color:var(--tl)}
+
+.dock-m{grid-area:m;background:var(--bg);padding:18px 22px;overflow-y:auto}
+.dock-m>h1:first-child,.dock-m>header:first-child{margin-bottom:10px}
+
+.dock-e{grid-area:e;background:var(--card);padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+.dock-e-sec{display:flex;flex-direction:column;gap:6px}
+.dock-e-sec h3{font-family:var(--ff-display);font-size:12px;color:var(--ft);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin:0}
+
+.dock-s{grid-area:s;background:var(--card);padding:7px 20px;border-top:1px solid var(--bd);font-size:11px;color:var(--ft);display:flex;align-items:center;gap:14px;min-height:28px}
+.dock-s-mark{font-family:var(--ff-display);color:var(--dm)}
+.dock-s-feed{flex:1;font-family:var(--ff-mono);color:var(--dm);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dock-s-cadence{font-family:var(--ff-mono);color:var(--sg)}
+
+@media(max-width:900px){
+  .dock-shell{grid-template-areas:"n" "w" "m" "e" "s";grid-template-rows:auto auto 1fr auto auto;grid-template-columns:1fr}
+  .dock-w,.dock-e{max-height:160px}
+}
+
 
 .ix-hd{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding-bottom:10px;border-bottom:1px solid var(--bd)}
 .ix-logo{font-family:var(--ff-display);font-weight:700;font-size:20px;letter-spacing:.3px;color:var(--tx)}
