@@ -30,5 +30,6 @@ export const TRACKER = provider('tracker');
 export const PEERS   = provider('peers');
 export const CHAT    = provider('chat');
 export const SIGNAL  = provider('signal');
+export const SANDBOX = provider('sandbox');
 
-export const PROVIDERS={SYS,AUTH,VERSION,ROOM,TRACKER,PEERS,CHAT,SIGNAL};
+export const PROVIDERS={SYS,AUTH,VERSION,ROOM,TRACKER,PEERS,CHAT,SIGNAL,SANDBOX};

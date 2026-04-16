@@ -7,6 +7,7 @@ import {startVersion} from './version.js';
 import {startAuth,onProfileChange,getProfile} from './auth.js';
 import {startMonitor,toggleMonitor} from './scada/monitor.js';
 import {SYS} from './scada/providers.js';
+import {startSandboxBridge} from './sandbox-bridge.js';
 
 function meLabel(){const p=getProfile();return p?.username||myNm}
 
@@ -31,6 +32,7 @@ SYS.write('trackerCount',TRACKERS.length,{type:'Counter'});
 SYS.write('userAgent',navigator.userAgent);
 
 startMonitor();
+startSandboxBridge();
 updPeers();
 startVersion();
 startAuth();
