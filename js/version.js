@@ -1,4 +1,5 @@
 import {$} from './ui.js';
+import {VERSION} from './scada/providers.js';
 
 const REPO='teslasolar/ACGP2P';
 const BRANCH='main';
@@ -26,9 +27,13 @@ async function fetchVersion(){
     if(!r.ok)throw new Error('HTTP '+r.status);
     const c=await r.json();
     last={sha:c.sha,date:c.commit.author.date,url:c.html_url,msg:c.commit.message.split('\n')[0]};
+    VERSION.write('sha',c.sha);VERSION.write('shortSha',c.sha.slice(0,7));
+    VERSION.write('committedAt',c.commit.author.date,{type:'DateTime'});
+    VERSION.write('message',last.msg);VERSION.write('url',c.html_url);
     paint();
   }catch(e){
     const el=$('ver');el.textContent='⌖ dev';el.title='version fetch failed: '+e.message;
+    VERSION.write('sha','dev',{quality:'bad'});
   }
 }
 

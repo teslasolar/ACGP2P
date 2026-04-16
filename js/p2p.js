@@ -2,6 +2,8 @@ import {log,badge} from './ui.js';
 import {TRACKERS,ICE,N_OFFERS,myId} from './config.js';
 import {pm,wire,updPeers} from './peers.js';
 import {addMsg} from './chat.js';
+import {ROOM,TRACKER,SIGNAL,PEERS} from './scada/providers.js';
+import {mkUDT} from './scada/udt.js';
 
 let ws=null,hash=null,room='',reTimer=null;
 let trackerIdx=0;
@@ -10,6 +12,17 @@ const pending=new Map();
 async function mkHash(name){
   const buf=await crypto.subtle.digest('SHA-1',new TextEncoder().encode('acg:'+name));
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+function publishTracker(url,state,extra={}){
+  TRACKER.write('current',mkUDT('Tracker',{
+    url,state,
+    connectedAt:extra.connectedAt??TRACKER.read('current')?.value?.connectedAt??null,
+    announces:TRACKER.read('announces')?.value||0,
+    lastAnnounceAt:TRACKER.read('lastAnnounceAt')?.value||null,
+    ...extra,
+  }));
+  TRACKER.write('state',state);
 }
 
 /* ═══ ICE + OFFER GENERATION ═══ */
@@ -40,6 +53,8 @@ export async function mkOffers(n){
 async function onOffer(msg){
   const rid=msg.peer_id;
   log('← offer from '+rid.slice(-8),'hi');
+  SIGNAL.write('last',mkUDT('SignalEvent',{kind:'offer',dir:'in',peerId:rid,offerId:msg.offer_id,ts:Date.now()}));
+  SIGNAL.inc('offersIn');
   const pc=new RTCPeerConnection(ICE);
   pc.ondatachannel=e=>wire(e.channel,rid);
   try{
@@ -52,6 +67,8 @@ async function onOffer(msg){
       to_peer_id:rid,answer:{type:'answer',sdp:pc.localDescription.sdp},offer_id:msg.offer_id
     }));
     log('→ answer to '+rid.slice(-8),'ok');
+    SIGNAL.write('last',mkUDT('SignalEvent',{kind:'answer',dir:'out',peerId:rid,offerId:msg.offer_id,ts:Date.now()}));
+    SIGNAL.inc('answersOut');
   }catch(e){log('offer handling failed: '+e.message,'er')}
 }
 
@@ -59,6 +76,8 @@ async function onAnswer(msg){
   const pc=pending.get(msg.offer_id);
   if(!pc){log('unknown offer_id','wr');return}
   log('← answer for '+msg.offer_id.slice(0,8),'hi');
+  SIGNAL.write('last',mkUDT('SignalEvent',{kind:'answer',dir:'in',offerId:msg.offer_id,ts:Date.now()}));
+  SIGNAL.inc('answersIn');
   try{await pc.setRemoteDescription(msg.answer)}catch(e){log('answer err: '+e.message,'er')}
 }
 
@@ -71,12 +90,15 @@ export async function announce(){
     numwant:50,uploaded:0,downloaded:0,left:1,offers
   }));
   log('✓ announced','ok');
+  TRACKER.inc('announces');
+  TRACKER.write('lastAnnounceAt',Date.now(),{type:'DateTime'});
 }
 
 /* ═══ CONNECT TO TRACKER (with fallback chain) ═══ */
 export function connectTracker(trackerUrl){
   return new Promise((resolve,reject)=>{
     log('trying: '+trackerUrl,'hi');
+    publishTracker(trackerUrl,'connecting');
     const sock=new WebSocket(trackerUrl);
     const timeout=setTimeout(()=>{
       sock.onopen=null;sock.onerror=null;sock.onclose=null;
@@ -93,11 +115,13 @@ export async function join(rName){
   if(reTimer)clearTimeout(reTimer);
   pending.clear();
   for(const[,info]of pm)for(const dc of info.dcs)try{dc.close()}catch(e){}
-  pm.clear();updPeers();
+  pm.clear();PEERS.clear();updPeers();
 
   room=rName;hash=await mkHash(rName);
   log('room: '+rName+' hash: '+hash.slice(0,12)+'...','hi');
   badge('connecting');
+  ROOM.write('data',mkUDT('Room',{name:rName,hash,peerCount:1,joinedAt:Date.now()}));
+  ROOM.write('name',rName);ROOM.write('hash',hash);ROOM.write('joinedAt',Date.now(),{type:'DateTime'});
 
   // try each tracker until one connects
   let connected=false;
@@ -110,6 +134,7 @@ export async function join(rName){
       connected=true;
 
       badge('connected');
+      publishTracker(url,'connected',{connectedAt:Date.now()});
       addMsg(null,null,null,'Connected to room: '+rName+' via '+url.split('/')[2],true);
 
       ws.onmessage=async e=>{
@@ -128,6 +153,7 @@ export async function join(rName){
       ws.onclose=()=>{
         log('tracker disconnected — retrying in 3s','wr');
         badge('reconnecting');
+        publishTracker(url,'reconnecting');
         setTimeout(()=>join(room),3000);
       };
 
@@ -139,12 +165,14 @@ export async function join(rName){
 
     }catch(e){
       log('✗ '+url+' — '+e.message,'er');
+      publishTracker(url,'failed');
     }
   }
 
   if(!connected){
     log('all trackers failed — retrying in 5s','er');
     badge('offline');
+    publishTracker('','offline');
     setTimeout(()=>join(room),5000);
   }
 }

@@ -5,6 +5,8 @@ import {send} from './chat.js';
 import {join,announce,wsReady} from './p2p.js';
 import {startVersion} from './version.js';
 import {startAuth,onProfileChange,getProfile} from './auth.js';
+import {startMonitor,toggleMonitor} from './scada/monitor.js';
+import {SYS} from './scada/providers.js';
 
 function meLabel(){const p=getProfile();return p?.username||myNm}
 
@@ -13,10 +15,22 @@ $('mId').textContent=meLabel();
 $('jBtn').onclick=()=>join($('rIn').value.trim()||'acg-guild');
 $('cIn').onkeydown=e=>{if(e.key==='Enter')send()};
 $('sBtn').onclick=send;
+$('scBtn').onclick=toggleMonitor;
+
+// keyboard: ctrl/cmd+. → toggle SCADA
+window.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='.'){e.preventDefault();toggleMonitor()}});
 
 log('⚒ ACG P2P Mesh v1.1','hi');
 log('peer: '+myId+' (20 bytes ✓)','hi');
 log('trackers: '+TRACKERS.length+' with auto-fallback','hi');
+
+// sys.* tags
+SYS.write('startedAt',Date.now(),{type:'DateTime'});
+SYS.write('myId',myId);SYS.write('myNm',myNm);SYS.write('myEm',myEm);
+SYS.write('trackerCount',TRACKERS.length,{type:'Counter'});
+SYS.write('userAgent',navigator.userAgent);
+
+startMonitor();
 updPeers();
 startVersion();
 startAuth();
@@ -32,5 +46,6 @@ onProfileChange(p=>{
 
 setTimeout(()=>join($('rIn').value.trim()||'acg-guild'),300);
 
-// periodic re-announce
+// periodic re-announce + uptime tick
 setInterval(()=>{if(wsReady())announce()},30000);
+setInterval(()=>SYS.write('uptimeSec',Math.floor((Date.now()-SYS.read('startedAt').value)/1000),{type:'Counter'}),1000);

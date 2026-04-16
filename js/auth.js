@@ -1,9 +1,12 @@
 import {$,esc,log} from './ui.js';
 import {OAUTH} from './config.js';
+import {AUTH} from './scada/providers.js';
+import {mkUDT} from './scada/udt.js';
 
 const KEY='acg.profile';
 const listeners=new Set();
 let profile=load();
+publishProfile();
 
 function load(){
   try{return JSON.parse(localStorage.getItem(KEY)||'null')}catch{return null}
@@ -12,8 +15,15 @@ function save(p){
   profile=p;
   if(p)localStorage.setItem(KEY,JSON.stringify(p));
   else localStorage.removeItem(KEY);
+  publishProfile();
   listeners.forEach(f=>{try{f(profile)}catch(e){}});
   paint();
+}
+
+function publishProfile(){
+  if(profile)AUTH.write('profile',mkUDT('Profile',profile));
+  else AUTH.del('profile');
+  AUTH.write('signedIn',!!profile);
 }
 
 export function getProfile(){return profile}

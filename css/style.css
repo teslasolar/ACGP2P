@@ -6,6 +6,33 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:linear-gradient(135de
 .hd h1{font-family:'Source Serif 4',serif;font-weight:700;font-size:17px}.hd h1 span{font-weight:400;color:var(--dm);font-size:13px;margin-left:6px}
 .bg{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600}.bg.t{background:var(--tlb);color:var(--tl)}.bg.s{background:var(--sgb);color:var(--sg)}.bg.a{background:var(--amb);color:var(--am)}.bg.r{background:var(--rsb);color:var(--rs)}
 .bg.v{background:#1c2128;color:#7ee787;font-family:'JetBrains Mono',monospace;text-decoration:none;letter-spacing:.2px}.bg.v:hover{background:#2d3138;color:#a5f3ae}
+.bg.sc{background:#161b22;color:#79c0ff;font-family:'JetBrains Mono',monospace;border:none;cursor:pointer;letter-spacing:.2px}.bg.sc:hover{background:#2d3138;color:#a6d8ff}
+#scada{position:fixed;top:0;right:-620px;width:620px;max-width:100vw;height:100vh;background:#0d1117;color:#c9d1d9;font-family:'JetBrains Mono',monospace;font-size:11px;z-index:1000;display:flex;flex-direction:column;box-shadow:-8px 0 32px rgba(0,0,0,.35);transition:right .22s ease}
+#scada.open{right:0}
+#scada .sc-hd{display:flex;gap:10px;align-items:center;padding:10px 14px;background:#010409;border-bottom:1px solid #30363d;font-size:12px;font-weight:600;color:#e6edf3}
+#scada .sc-hd span{flex:0 0 auto}
+#scada .sc-f{flex:1;background:#0d1117;color:#c9d1d9;border:1px solid #30363d;border-radius:6px;padding:5px 9px;font-family:inherit;font-size:11px;outline:none}
+#scada .sc-f:focus{border-color:#388bfd}
+#scada .sc-hd .bt.g{background:#21262d;color:#c9d1d9;border:1px solid #30363d;font-size:14px;padding:3px 10px;line-height:1}
+#scada .sc-hd .bt.g:hover{background:#30363d;color:#fff;border-color:#8b949e}
+#scada .sc-wrap{flex:1;overflow:auto}
+#scada .sc-tbl{width:100%;border-collapse:collapse;font-size:11px}
+#scada .sc-tbl thead{position:sticky;top:0;background:#161b22;z-index:1}
+#scada .sc-tbl th{text-align:left;padding:6px 10px;font-weight:500;color:#8b949e;border-bottom:1px solid #30363d}
+#scada .sc-tbl td{padding:4px 10px;border-bottom:1px solid #21262d;vertical-align:top;word-break:break-all}
+#scada .sc-tbl td.p{color:#79c0ff}
+#scada .sc-tbl td.v{color:#e6edf3;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#scada .sc-tbl td.t{color:#d2a8ff;font-style:italic}
+#scada .sc-tbl td.a{color:#8b949e;text-align:right;white-space:nowrap}
+#scada .sc-tbl tr:hover{background:#161b22}
+#scada .sc-tbl tr:hover td.v{white-space:normal}
+#scada .sc-tbl .q-good td.q{color:#7ee787}
+#scada .sc-tbl .q-stale td.q{color:#e3b341}
+#scada .sc-tbl .q-bad td.q{color:#f85149}
+#scada .sc-tbl .q-uncertain td.q{color:#79c0ff}
+#scada .sc-tbl .mt{color:#6e7681;text-align:center;padding:20px;font-style:italic}
+#scada .sc-ft{padding:6px 14px;background:#010409;border-top:1px solid #30363d;font-size:10px;color:#6e7681;text-align:right}
+@media(max-width:800px){#scada{width:100vw;right:-100vw}}
 .bt.gh{background:#24292f;color:#fff;border:1px solid #24292f}.bt.gh:hover{background:#1c2128;border-color:#1c2128;color:#fff}
 .bt.dc{background:#5865f2;color:#fff;border:1px solid #5865f2}.bt.dc:hover{background:#4752c4;border-color:#4752c4;color:#fff}
 .usr{display:flex;align-items:center;gap:6px}.usr img{width:22px;height:22px;border-radius:50%;border:1px solid var(--bd)}.usr span{font-size:11px;font-weight:600;color:var(--tx)}
