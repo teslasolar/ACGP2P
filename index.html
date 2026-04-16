@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>⚒ ACG P2P · AI Craftspeople Guild</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #faf6f0;
+  --bg-warm: #f5ede0;
+  --bg-card: #ffffff;
+  --bg-card-hover: #fdfcfa;
+  --bg-input: #faf6f0;
+  --bg-terminal: #1c2128;
+  --bg-terminal2: #22272e;
+
+  --text: #1a2332;
+  --text-dim: #5a6672;
+  --text-faint: #8d95a0;
+
+  --teal: #1a5c4c;
+  --teal-light: #2d7a68;
+  --teal-bg: #e8f4f0;
+
+  --amber: #c47a20;
+  --amber-light: #e8a840;
+  --amber-bg: #fdf2e0;
+
+  --rose: #b85c5c;
+  --rose-bg: #fce8e8;
+
+  --sage: #4a8868;
+  --sage-bg: #e8f2ec;
+
+  --border: #e4ddd0;
+  --border-light: #ede8de;
+  --shadow: rgba(40, 30, 15, 0.08);
+  --shadow-lg: rgba(40, 30, 15, 0.12);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: var(--bg);
+  background-image: linear-gradient(135deg, #faf6f0 0%, #f0e8d8 50%, #f5ece0 100%);
+  color: var(--text);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* HEADER */
+.header {
+  padding: 14px 24px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 3px var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  z-index: 10;
+}
+.header .logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.header .logo .hammer {
+  font-size: 18px;
+  color: var(--teal);
+}
+.header h1 {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.header h1 span {
+  font-weight: 400;
+  color: var(--text-dim);
+  font-size: 14px;
+  margin-left: 6px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge.teal { background: var(--teal-bg); color: var(--teal); }
+.badge.amber { background: var(--amber-bg); color: var(--amber); }
+.badge.sage { background: var(--sage-bg); color: var(--sage); }
+
+.room-input {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.room-input label {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-weight: 500;
+}
+.room-input input {
+  padding: 6px 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  width: 140px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.room-input input:focus { border-color: var(--teal); }
+
+.btn {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-teal { background: var(--teal); color: #fff; }
+.btn-teal:hover { background: var(--teal-light); }
+.btn-ghost { background: var(--bg-input); color: var(--text-dim); border: 1px solid var(--border); }
+.btn-ghost:hover { border-color: var(--teal); color: var(--teal); }
+
+.stats {
+  display: flex;
+  gap: 16px;
+  margin-left: auto;
+  font-size: 12px;
+  align-items: center;
+}
+.stat { display: flex; align-items: center; gap: 5px; color: var(--text-dim); }
+.stat-val { color: var(--teal); font-weight: 700; }
+.dot { width: 8px; height: 8px; border-radius: 50%; }
+.dot.on { background: var(--sage); box-shadow: 0 0 6px var(--sage); }
+.dot.connecting { background: var(--amber); animation: pulse 1s infinite; }
+.dot.off { background: var(--text-faint); }
+@keyframes pulse { 50% { opacity: 0.4; } }
+
+/* NAV */
+.nav {
+  display: flex;
+  gap: 2px;
+  padding: 0 24px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+}
+.nav button {
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.nav button:hover { color: var(--text); }
+.nav button.active {
+  color: var(--teal);
+  border-bottom-color: var(--teal);
+  font-weight: 600;
+}
+
+/* MAIN */
+.main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 16px;
+  padding: 16px 24px;
+  overflow: hidden;
+}
+
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px var(--shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.panel-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-light);
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.panel-header .icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+}
+.panel-header .icon.teal { background: var(--teal-bg); }
+.panel-header .icon.amber { background: var(--amber-bg); }
+.panel-header .icon.sage { background: var(--sage-bg); }
+.panel-header .count {
+  margin-left: auto;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  color: var(--text-faint);
+  font-weight: 500;
+}
+.panel-body { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+
+/* CHAT PANEL (main area) */
+.chat-area { flex: 1; overflow-y: auto; padding: 16px; }
+.chat-area::-webkit-scrollbar { width: 4px; }
+.chat-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.chat-msg { margin-bottom: 12px; display: flex; flex-direction: column; }
+.chat-msg.self { align-items: flex-end; }
+.chat-meta {
+  font-size: 11px;
+  color: var(--text-faint);
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+.chat-bubble {
+  display: inline-block;
+  max-width: 75%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+.chat-msg:not(.self) .chat-bubble {
+  background: var(--bg-warm);
+  border: 1px solid var(--border-light);
+  border-bottom-left-radius: 4px;
+}
+.chat-msg.self .chat-bubble {
+  background: var(--teal);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+.chat-bubble.system {
+  background: none;
+  border: none;
+  color: var(--text-faint);
+  font-style: italic;
+  font-size: 12px;
+  padding: 4px 0;
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border-light);
+  background: var(--bg-card);
+}
+.chat-input-row input {
+  flex: 1;
+  padding: 10px 14px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.chat-input-row input:focus { border-color: var(--teal); }
+
+/* TERMINAL PANEL */
+.terminal-wrap {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.terminal {
+  flex: 1;
+  background: var(--bg-terminal);
+  padding: 12px 14px;
+  overflow-y: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #adbac7;
+  border-radius: 0 0 0 0;
+}
+.terminal::-webkit-scrollbar { width: 4px; }
+.terminal::-webkit-scrollbar-thumb { background: #444; border-radius: 2px; }
+.line { margin-bottom: 1px; }
+.line.prompt { color: #7ee787; }
+.line.prompt::before { content: '⚒ '; color: #7ee787; }
+.line.output { color: #8b949e; }
+.line.error { color: #f85149; }
+.line.info { color: #79c0ff; }
+
+.term-input-row {
+  display: flex;
+  gap: 6px;
+  padding: 8px 10px;
+  background: var(--bg-terminal2);
+  border-top: 1px solid #333;
+}
+.term-input-row input {
+  flex: 1;
+  padding: 8px 10px;
+  background: var(--bg-terminal);
+  border: 1px solid #444;
+  border-radius: 6px;
+  color: #adbac7;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  outline: none;
+}
+.term-input-row input:focus { border-color: #79c0ff; }
+.term-input-row .btn {
+  background: var(--teal);
+  color: #fff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  padding: 6px 10px;
+}
+
+/* SIDEBAR */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* PEERS */
+.peer-list { flex: 1; overflow-y: auto; padding: 10px; }
+.peer-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  transition: background 0.12s;
+}
+.peer-card:hover { background: var(--bg-warm); }
+.peer-card.self { background: var(--teal-bg); }
+.peer-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+  background: var(--bg-warm);
+  border: 1px solid var(--border);
+}
+.peer-card.self .peer-avatar { background: var(--teal-bg); border-color: var(--teal); }
+.peer-name { font-size: 12px; font-weight: 500; color: var(--text); }
+.peer-name small { display: block; font-size: 10px; color: var(--text-faint); font-weight: 400; }
+
+/* FILES */
+.file-list { flex: 1; overflow-y: auto; padding: 10px; }
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.12s;
+}
+.file-item:hover { background: var(--bg-warm); }
+.file-item .size { color: var(--text-faint); font-size: 10px; margin-left: auto; }
+
+.empty-state {
+  color: var(--text-faint);
+  font-size: 12px;
+  text-align: center;
+  padding: 20px;
+  font-style: italic;
+}
+
+/* TABS for main panel */
+.tab-content { display: none; flex: 1; overflow: hidden; flex-direction: column; }
+.tab-content.active { display: flex; }
+
+/* FOOTER */
+.footer {
+  padding: 8px 24px;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+  font-size: 10px;
+  color: var(--text-faint);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.footer a { color: var(--teal); text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
+
+@media (max-width: 800px) {
+  .main { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .stats { margin-left: 0; }
+  .main { padding: 10px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <span class="hammer">⚒</span>
+    <h1>ACG P2P<span>· guild mesh</span></h1>
+  </div>
+  <span class="badge teal">WebRTC</span>
+  <span class="badge sage">P2P</span>
+  <div class="room-input">
+    <label>Room</label>
+    <input type="text" id="roomInput" value="acg-guild" placeholder="room name">
+    <button class="btn btn-teal" id="joinBtn">Join</button>
+  </div>
+  <div class="stats">
+    <div class="stat">
+      <span class="dot connecting" id="connDot"></span>
+      <span id="connStatus">Connecting</span>
+    </div>
+    <div class="stat">
+      <span>👥</span>
+      <span class="stat-val" id="peerCount">1</span>
+    </div>
+    <div class="stat">
+      <span>📁</span>
+      <span class="stat-val" id="fileCount">0</span>
+    </div>
+  </div>
+</div>
+
+<div class="nav">
+  <button class="active" data-tab="chat">💬 Chat</button>
+  <button data-tab="terminal">💻 Terminal</button>
+  <button data-tab="files">📁 Files</button>
+</div>
+
+<div class="main">
+  <!-- LEFT: tabbed main area -->
+  <div class="panel">
+    <div class="panel-body">
+
+      <!-- CHAT TAB -->
+      <div class="tab-content active" id="tab-chat">
+        <div class="chat-area" id="chatMessages"></div>
+        <div class="chat-input-row">
+          <input type="text" id="chatInput" placeholder="Type a message..." spellcheck="false">
+          <button class="btn btn-teal" id="sendChatBtn">Send</button>
+        </div>
+      </div>
+
+      <!-- TERMINAL TAB -->
+      <div class="tab-content" id="tab-terminal">
+        <div class="terminal-wrap">
+          <div class="terminal" id="terminal"></div>
+          <div class="term-input-row">
+            <input type="text" id="cmdInput" placeholder="Type command..." spellcheck="false">
+            <button class="btn" onclick="runCommand()">Run</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- FILES TAB -->
+      <div class="tab-content" id="tab-files">
+        <div class="panel-header" style="border-bottom:1px solid var(--border-light)">
+          <span class="icon amber">📁</span>
+          Shared Files
+          <button class="btn btn-ghost" style="margin-left:auto;font-size:11px" id="newFileBtn">+ New File</button>
+        </div>
+        <div class="file-list" id="fileList">
+          <div class="empty-state">No shared files yet</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RIGHT SIDEBAR -->
+  <div class="sidebar">
+    <div class="panel" style="flex:1">
+      <div class="panel-header">
+        <span class="icon sage">👥</span>
+        Peers
+        <span class="count" id="peerLabel">1 online</span>
+      </div>
+      <div class="panel-body">
+        <div class="peer-list" id="peerList"></div>
+      </div>
+    </div>
+
+    <div class="panel" style="flex:0 0 auto">
+      <div style="padding:14px 16px">
+        <div style="font-family:'Source Serif 4',serif;font-weight:600;font-size:13px;color:var(--text);margin-bottom:8px">⚒ ACG ⚒</div>
+        <div style="font-size:11px;color:var(--text-dim);line-height:1.5;margin-bottom:10px">
+          Peer-to-peer guild workspace. No server stores your messages. Connect directly to other guild members.
+        </div>
+        <a href="https://aicraftspeopleguild.github.io" target="_blank" class="btn btn-ghost" style="display:inline-block;text-decoration:none;font-size:11px;width:100%;text-align:center">
+          Visit Guild Site →
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <span>⚒ AI Craftspeople Guild · P2P Mesh</span>
+  <span><a href="https://github.com/aicraftspeopleguild" target="_blank">github.com/aicraftspeopleguild</a></span>
+  <span>© 2026 ACG · Craft over hype</span>
+</div>
+
+<script type="module">
+const $ = id => document.getElementById(id);
+
+// ═══ TAB SWITCHING ═══
+document.querySelectorAll('.nav button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    $('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ═══ P2P STATE ═══
+const TRACKER = 'wss://tracker.openwebtorrent.com';
+const ICE = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+const NUM_OFFERS = 5;
+
+let ws = null;
+let infoHash = null;
+let currentRoom = '';
+const peers = new Map();
+const dataChannels = new Map();
+const pendingOffers = new Map();
+const sharedFiles = new Map();
+
+const myId = '-ACG01-' + Array.from(crypto.getRandomValues(new Uint8Array(7))).map(b => b.toString(16).padStart(2,'0')).join('');
+const myName = myId.slice(0, 13);
+const myEmoji = ['⚒️','🔨','🛠️','⚙️','🔧','📐','🧬','🛡️','📋','🔬','🌿','✦'][Math.floor(Math.random() * 12)];
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ═══ TERMINAL ═══
+function termPrint(text, type = 'output') {
+  const line = document.createElement('div');
+  line.className = `line ${type}`;
+  line.textContent = text;
+  $('terminal').appendChild(line);
+  $('terminal').scrollTop = $('terminal').scrollHeight;
+}
+
+// ═══ CHAT ═══
+function addChatMsg(userId, name, emoji, text, isSystem = false) {
+  const isSelf = userId === myId;
+  const div = document.createElement('div');
+  div.className = `chat-msg ${isSelf ? 'self' : ''}`;
+  if (isSystem) {
+    div.innerHTML = `<div class="chat-bubble system">${esc(text)}</div>`;
+  } else {
+    div.innerHTML = `
+      <div class="chat-meta">${esc(emoji)} ${esc(name)}</div>
+      <div class="chat-bubble">${esc(text)}</div>
+    `;
+  }
+  $('chatMessages').appendChild(div);
+  $('chatMessages').scrollTop = $('chatMessages').scrollHeight;
+}
+
+// ═══ WEBRTC P2P ═══
+async function roomToHash(name) {
+  const data = new TextEncoder().encode('acg:' + name);
+  const hash = await crypto.subtle.digest('SHA-1', data);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+async function generateOffers(count) {
+  const offers = [];
+  for (let i = 0; i < count; i++) {
+    const pc = new RTCPeerConnection(ICE);
+    const dc = pc.createDataChannel('acg');
+    const offerId = crypto.randomUUID();
+    await new Promise(resolve => {
+      pc.onicecandidate = e => { if (!e.candidate) resolve(); };
+      pc.createOffer().then(o => pc.setLocalDescription(o));
+    });
+    offers.push({ offer_id: offerId, offer: { type: 'offer', sdp: pc.localDescription.sdp } });
+    pendingOffers.set(offerId, { pc, dc });
+    setupPC(pc, dc, offerId);
+  }
+  return offers;
+}
+
+function setupPC(pc, dc, id) {
+  dc.onopen = () => {
+    termPrint(`peer connected: ${id.slice(0,8)}`, 'info');
+    dataChannels.set(id, dc);
+    if (!peers.has(id)) {
+      peers.set(id, { name: id.slice(0,12), emoji: '⚒️' });
+      updatePeers();
+      addChatMsg(null, null, null, `⚒️ ${id.slice(0,8)} joined the guild`, true);
+    }
+    for (const [path, file] of sharedFiles) {
+      dc.send(JSON.stringify({ type: 'file', senderId: myId, path, content: file.content, owner: file.owner }));
+    }
+    dc.send(JSON.stringify({ type: 'announce', senderId: myId, name: myName, emoji: myEmoji }));
+  };
+  dc.onclose = () => {
+    dataChannels.delete(id);
+    if (peers.has(id)) {
+      const peer = peers.get(id);
+      addChatMsg(null, null, null, `${peer.emoji} ${peer.name} left`, true);
+      peers.delete(id);
+      updatePeers();
+    }
+  };
+  dc.onmessage = e => {
+    try {
+      const msg = JSON.parse(e.data);
+      if (msg.senderId === myId) return;
+      switch (msg.type) {
+        case 'chat':
+          const peer = peers.get(msg.senderId) || { name: msg.senderId.slice(0,12), emoji: '⚒️' };
+          addChatMsg(msg.senderId, peer.name, peer.emoji, msg.text);
+          break;
+        case 'file':
+          sharedFiles.set(msg.path, { content: msg.content, owner: msg.owner });
+          updateFiles();
+          break;
+        case 'announce':
+          if (!peers.has(msg.senderId)) {
+            peers.set(msg.senderId, { name: msg.name || msg.senderId.slice(0,12), emoji: msg.emoji || '⚒️' });
+            updatePeers();
+          }
+          break;
+      }
+    } catch (err) { console.error('msg error:', err); }
+  };
+}
+
+async function handleOffer(msg) {
+  const pc = new RTCPeerConnection(ICE);
+  pc.ondatachannel = e => setupPC(pc, e.channel, msg.peer_id);
+  await pc.setRemoteDescription(msg.offer);
+  const answer = await pc.createAnswer();
+  await pc.setLocalDescription(answer);
+  await new Promise(resolve => {
+    if (pc.iceGatheringState === 'complete') resolve();
+    else pc.onicecandidate = e => { if (!e.candidate) resolve(); };
+  });
+  ws.send(JSON.stringify({
+    action: 'announce', info_hash: infoHash, peer_id: myId,
+    to_peer_id: msg.peer_id, answer: { type: 'answer', sdp: pc.localDescription.sdp },
+    offer_id: msg.offer_id,
+  }));
+}
+
+async function handleAnswer(msg) {
+  const pending = pendingOffers.get(msg.offer_id);
+  if (pending) await pending.pc.setRemoteDescription(msg.answer);
+}
+
+async function reannounce() {
+  if (ws?.readyState !== 1) return;
+  const offers = await generateOffers(NUM_OFFERS);
+  ws.send(JSON.stringify({
+    action: 'announce', info_hash: infoHash, peer_id: myId, numwant: 10, offers,
+  }));
+}
+
+function broadcast(msg) {
+  const data = JSON.stringify(msg);
+  for (const dc of dataChannels.values()) {
+    if (dc.readyState === 'open') dc.send(data);
+  }
+}
+
+function updatePeers() {
+  const list = $('peerList');
+  list.innerHTML = '';
+
+  const selfCard = document.createElement('div');
+  selfCard.className = 'peer-card self';
+  selfCard.innerHTML = `
+    <div class="peer-avatar">${esc(myEmoji)}</div>
+    <div class="peer-name">${esc(myName)}<small>you</small></div>
+  `;
+  list.appendChild(selfCard);
+
+  for (const [id, peer] of peers) {
+    const card = document.createElement('div');
+    card.className = 'peer-card';
+    card.innerHTML = `
+      <div class="peer-avatar">${esc(peer.emoji)}</div>
+      <div class="peer-name">${esc(peer.name)}</div>
+    `;
+    list.appendChild(card);
+  }
+
+  const count = peers.size + 1;
+  $('peerCount').textContent = count;
+  $('peerLabel').textContent = count + ' online';
+}
+
+function updateFiles() {
+  const list = $('fileList');
+  if (sharedFiles.size === 0) {
+    list.innerHTML = '<div class="empty-state">No shared files yet</div>';
+    $('fileCount').textContent = '0';
+    return;
+  }
+  list.innerHTML = '';
+  for (const [path, file] of sharedFiles) {
+    const div = document.createElement('div');
+    div.className = 'file-item';
+    div.innerHTML = `
+      <span>📄</span>
+      <span style="flex:1;font-weight:500">${esc(path)}</span>
+      <span class="size">${file.content?.length || 0}b</span>
+    `;
+    div.onclick = () => {
+      // switch to terminal tab and show file
+      document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelector('[data-tab="terminal"]').classList.add('active');
+      $('tab-terminal').classList.add('active');
+      termPrint(`cat ${path}`, 'prompt');
+      termPrint(file.content || '(empty)');
+    };
+    list.appendChild(div);
+  }
+  $('fileCount').textContent = sharedFiles.size;
+}
+
+async function joinRoom(roomName) {
+  if (ws) ws.close();
+  dataChannels.clear();
+  pendingOffers.clear();
+  peers.clear();
+
+  currentRoom = roomName;
+  infoHash = await roomToHash(roomName);
+
+  $('connDot').className = 'dot connecting';
+  $('connStatus').textContent = 'Connecting';
+  termPrint(`joining room: ${roomName}`, 'info');
+
+  const offers = await generateOffers(NUM_OFFERS);
+
+  ws = new WebSocket(TRACKER);
+
+  ws.onopen = () => {
+    termPrint('connected to tracker', 'info');
+    $('connDot').className = 'dot on';
+    $('connStatus').textContent = 'Connected';
+    addChatMsg(null, null, null, `Connected to room: ${roomName}`, true);
+    ws.send(JSON.stringify({
+      action: 'announce', info_hash: infoHash, peer_id: myId,
+      numwant: 10, uploaded: 0, downloaded: 0, left: 1, offers,
+    }));
+  };
+
+  ws.onmessage = async (e) => {
+    try {
+      const msg = JSON.parse(e.data);
+      if (msg.offer && msg.peer_id !== myId) await handleOffer(msg);
+      if (msg.answer && msg.offer_id) await handleAnswer(msg);
+      if (msg.interval) setTimeout(() => reannounce(), msg.interval * 1000);
+    } catch (err) { console.error('tracker error:', err); }
+  };
+
+  ws.onerror = () => {
+    termPrint('tracker error', 'error');
+    $('connDot').className = 'dot off';
+    $('connStatus').textContent = 'Error';
+  };
+
+  ws.onclose = () => {
+    termPrint('reconnecting...', 'info');
+    $('connDot').className = 'dot connecting';
+    $('connStatus').textContent = 'Reconnecting';
+    setTimeout(() => joinRoom(currentRoom), 5000);
+  };
+
+  updatePeers();
+  updateFiles();
+}
+
+// ═══ COMMANDS ═══
+const commands = {
+  help: () => [
+    'commands:',
+    '  help      show this list',
+    '  whoami    your identity',
+    '  peers     list connected peers',
+    '  room      current room',
+    '  ls        list shared files',
+    '  cat <f>   view file content',
+    '  write <f> <content>  create shared file',
+    '  clear     clear terminal',
+  ].join('\n'),
+  whoami: () => `${myEmoji} ${myId}\nroom: ${currentRoom}`,
+  peers: () => {
+    const list = [`${myEmoji} ${myName} (you)`];
+    for (const [, p] of peers) list.push(`${p.emoji} ${p.name}`);
+    return list.join('\n');
+  },
+  room: () => currentRoom,
+  ls: () => sharedFiles.size ? [...sharedFiles.keys()].join('\n') : '(no files)',
+  cat: (args) => {
+    const path = args[0];
+    if (!path) return 'usage: cat <file>';
+    const file = sharedFiles.get(path) || sharedFiles.get('/' + path);
+    return file ? file.content : 'file not found';
+  },
+  write: (args) => {
+    const path = args[0];
+    const content = args.slice(1).join(' ');
+    if (!path) return 'usage: write <file> <content>';
+    const fullPath = path.startsWith('/') ? path : '/' + path;
+    sharedFiles.set(fullPath, { content, owner: myId });
+    updateFiles();
+    broadcast({ type: 'file', senderId: myId, path: fullPath, content, owner: myId });
+    return `created ${fullPath}`;
+  },
+  clear: () => { $('terminal').innerHTML = ''; return ''; },
+};
+
+window.runCommand = function() {
+  const input = $('cmdInput').value.trim();
+  if (!input) return;
+  $('cmdInput').value = '';
+  termPrint(input, 'prompt');
+  const [cmd, ...args] = input.split(' ');
+  if (commands[cmd]) {
+    const result = commands[cmd](args);
+    if (result) termPrint(result);
+  } else {
+    termPrint(`unknown: ${cmd}`, 'error');
+  }
+};
+
+function sendChat() {
+  const text = $('chatInput').value.trim();
+  if (!text) return;
+  $('chatInput').value = '';
+  broadcast({ type: 'chat', senderId: myId, text });
+  addChatMsg(myId, myName, myEmoji, text);
+}
+
+$('newFileBtn').onclick = () => {
+  const name = prompt('File name:');
+  if (!name) return;
+  const content = prompt('Content:') || '';
+  const path = '/' + name.replace(/^\//, '');
+  sharedFiles.set(path, { content, owner: myId });
+  updateFiles();
+  broadcast({ type: 'file', senderId: myId, path, content, owner: myId });
+  termPrint(`created ${path}`, 'info');
+};
+
+// ═══ EVENTS ═══
+$('joinBtn').onclick = () => joinRoom($('roomInput').value.trim() || 'acg-guild');
+$('cmdInput').onkeydown = e => { if (e.key === 'Enter') runCommand(); };
+$('chatInput').onkeydown = e => { if (e.key === 'Enter') sendChat(); };
+$('sendChatBtn').onclick = sendChat;
+
+// ═══ INIT ═══
+termPrint('⚒ ACG P2P Mesh v1.0', 'info');
+termPrint('AI Craftspeople Guild · peer-to-peer workspace', 'info');
+termPrint('type help for commands', 'info');
+
+updatePeers();
+updateFiles();
+
+setTimeout(() => joinRoom($('roomInput').value.trim() || 'acg-guild'), 500);
+</script>
+</body>
+</html>
