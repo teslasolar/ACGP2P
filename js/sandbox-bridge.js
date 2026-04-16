@@ -1,29 +1,30 @@
 // ═══ Sandbox ↔ ACG bridge (main side) ═══
-// Subscribes to BroadcastChannel('acg-sandbox') and folds each event into
-// the SCADA tag plant under `sandbox.<tool>.*`. When a sandbox tool relays
-// its own tag writes (event === 'tag'), mirror the path verbatim so the
-// main HMI shows the same hierarchy the tool uses internally.
+// Subscribes to BroadcastChannel("acg-mesh") and folds each envelope into
+// the SCADA tag plant. Canonical envelope (§4):
+//   { source, type, path?, value?, ts, … }
+//
+// Routing:
+//   type === "tag"  →  sandbox.<source>.<path>  (mirrors the sandbox's
+//                       internal tag path verbatim; preserves quality + udt)
+//   else            →  sandbox.<source>.event.<type>  (full envelope as
+//                       value) + increments sandbox.<source>.events.<type>.count
 
 import * as tags from './scada/tags.js';
 
-const CHAN='acg-sandbox';
+const CHAN='acg-mesh';
 let ch=null;
 
 function onEnvelope(env){
-  if(!env||env.type!=='sandbox')return;
-  const base=`sandbox.${env.tool||'unknown'}`;
+  if(!env||!env.source||!env.type)return;
+  const base=`sandbox.${env.source}`;
   tags.write(base+'.lastEventAt',env.ts||Date.now(),{type:'DateTime'});
-  tags.write(base+'.lastEvent',env.event||'');
+  tags.write(base+'.lastEvent',env.type);
 
-  if(env.event==='tag'&&env.data?.path){
-    // The sandbox is relaying one of its own tags — mirror it.
-    const{path,tag}=env.data;
-    tags.write(`${base}.${path}`,tag.value,{type:tag.type,quality:tag.quality});
+  if(env.type==='tag'&&env.path){
+    tags.write(`${base}.${env.path}`,env.value,{type:env.udt||null,quality:env.quality||'good'});
   }else{
-    // Generic event → flattened payload.
-    const payload=env.data||{};
-    tags.write(`${base}.event.${env.event}`,payload);
-    tags.inc(`${base}.events.${env.event}.count`);
+    tags.write(`${base}.event.${env.type}`,env);
+    tags.inc(`${base}.events.${env.type}.count`);
   }
 }
 
@@ -31,6 +32,7 @@ export function startSandboxBridge(){
   try{ch=new BroadcastChannel(CHAN)}catch(e){return}
   ch.addEventListener('message',e=>onEnvelope(e.data));
   tags.write('sandbox.bridgeOpen',true);
+  tags.write('sandbox.channel',CHAN);
 }
 
 export function stopSandboxBridge(){

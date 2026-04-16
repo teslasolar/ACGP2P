@@ -1,36 +1,39 @@
 // ═══ ACG Sandbox ↔ mesh bridge ═══
-// A thin BroadcastChannel wrapper so sandbox tools (in their own tabs) can
-// stream events to the main ACG P2P page, which folds them into its SCADA
-// tag plant under `sandbox.<tool>.*`. One channel, one shape.
+// Canonical channel: BroadcastChannel("acg-mesh").
+// Canonical envelope (§4): { source:s type:s path:s value:any ts:ms … }
 //
-//   Event envelope: {type:'sandbox', tool, event, data, ts}
+//   source  — owning tool name ("web-llm", …)
+//   type    — "tag" for scada-tag relays; otherwise event name ("init",
+//             "tool_call", "file_change", …)
+//   path    — tag path or event sub-path (optional)
+//   value   — tag value or event payload (optional)
+//   ts      — epoch ms
 //
-// Usage from a sandbox tool:
-//   import {bridge} from '../shared/mesh-bridge.js';
-//   bridge.publish('web-llm', 'tool-call', {name, args, ok:true});
-//   bridge.publish('web-llm', 'file-change', {path, size});
+// Usage (sandbox side):
+//   bridge.publish('web-llm','tag',{path:'engine.ready',value:true,quality:'good',udt:null});
+//   bridge.publish('web-llm','tool_call',{path:'create_file',value:{ok:true,path:'/x'}});
 //
-// Usage from the main ACG page:
-//   bridge.subscribe(e => { /* e = {tool, event, data, ts} */ });
+// Usage (main ACG side):
+//   bridge.subscribe(env => { ... });
 
-const CHAN='acg-sandbox';
+const CHAN='acg-mesh';
 
 function openChannel(){
   try{return new BroadcastChannel(CHAN)}
-  catch(e){return null} // BroadcastChannel unsupported (rare)
+  catch(e){return null}
 }
-
 const ch=openChannel();
 
 export const bridge={
-  publish(tool,event,data={}){
-    const env={type:'sandbox',tool,event,data,ts:Date.now()};
+  channel:CHAN,
+  publish(source,type,extra={}){
+    const env={source,type,ts:Date.now(),...extra};
     if(ch)try{ch.postMessage(env)}catch(e){}
     return env;
   },
   subscribe(fn){
     if(!ch)return()=>{};
-    const handler=e=>{if(e?.data?.type==='sandbox')fn(e.data)};
+    const handler=e=>{const env=e?.data;if(env&&env.source&&env.type)fn(env)};
     ch.addEventListener('message',handler);
     return()=>ch.removeEventListener('message',handler);
   },

@@ -17,7 +17,8 @@ const repo={
 const nextCommitId=()=>Math.random().toString(36).slice(2,9);
 const now=()=>Date.now();
 const normalize=p=>p.startsWith('/')?p:('/'+p);
-const publish=(event,data)=>bridge.publish(TOOL,event,data);
+// flat envelope per §4: {source, type, path, value, ts}
+const publish=(type,data)=>bridge.publish(TOOL,type,{path:data?.path||null,value:data});
 
 function typeOf(path){
   const ext=(path.split('.').pop()||'').toLowerCase();

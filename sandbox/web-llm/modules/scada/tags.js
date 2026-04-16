@@ -38,8 +38,8 @@ export function write(path,value,opts={}){
   };
   tags.set(path,tag);
   notify(path);
-  // relay across BroadcastChannel to main ACG
-  bridge.publish(TOOL,'tag',{path,tag});
+  // relay across BroadcastChannel to main ACG (flat envelope per §4)
+  bridge.publish(TOOL,'tag',{path,value:tag.value,quality:tag.quality,udt:tag.type});
   return tag;
 }
 
