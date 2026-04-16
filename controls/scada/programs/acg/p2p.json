@@ -2,7 +2,7 @@
   "§": "2.2",
   "🏗️": "📡",
   "name": "p2p",
-  "module": "js/p2p.js",
+  "module": "controls/scada/gateway/scripts/p2p.js",
 
   "📦": {
     "ws":        "🔌?",

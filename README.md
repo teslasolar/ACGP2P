@@ -116,22 +116,16 @@ flowchart LR
 │   │   ├─ programs/           per-module dense-glyph specs
 │   │   ├─ errors/         ⚠  owns errors.*  (gateway-log area)
 │   │   └─ gateway/        🛰  SCADA gateway host
-│   │       └─ auth/       🔑  identity module · owns auth.*
-│   │           ├─ webrtc/         📡 cryptographic peer-id identity
-│   │           ├─ webtorrent/     🌊 tracker-based peer discovery (info_hash bearer)
-│   │           └─ discord/ github/ google/   OAuth sub-providers
+│   │       ├─ styles/         theme.css · style.css · section.css   (HMI consistency)
+│   │       ├─ scripts/        runtime ES modules (main · ui · config · p2p · peers · chat · auth · version · errors · sandbox-bridge · scada/*)
+│   │       ├─ providers/      registry.json — canonical tag-provider registry
+│   │       └─ auth/       🔑  identity module · owns auth.* (webrtc/webtorrent/discord/github/google)
 │   ├─ hmi/                🖼  ISA-101 operator interface (layers, palette, faceplates)
 │   ├─ plc/                🔧  GitPLC universal PLC namespace (git/ UDT templates)
 │   ├─ sandbox/            🧪  browser-only tools · owns sandbox.*
 │   │   └─ web-llm/          🧠 voice-powered in-browser LLM
 │   ├─ db/                 🗄️  tags.json (HMI source) · README.md
 │   └─ docs/standards/     📐  Konomi meta-standard + GitPLC standard
-├─ js/                   runtime · ES modules
-│   ├─ main.js   ui.js   config.js   p2p.js   peers.js   chat.js
-│   ├─ auth.js   version.js   errors.js   sandbox-bridge.js
-│   └─ scada/           tags.js · providers.js · monitor.js · udt.js
-├─ css/                  theme.css · style.css
-├─ providers.json        registry of every subsystem provider
 ├─ .github/
 │   ├─ ISSUE_TEMPLATE/   tag-update · log-entry · control-action
 │   └─ workflows/        sync-db.yml

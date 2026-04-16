@@ -1,8 +1,8 @@
 /* ═══ ACG Sandbox · shared theme ═══
- * Consumes the global tokens from css/theme.css. Same warm parchment
- * skin as the main chat, adapted for tool pages.
+ * Consumes the global tokens from controls/scada/gateway/styles/theme.css.
+ * The SCADA gateway is the single source of truth for all HMI styles.
  */
-@import url('../../../css/theme.css');
+@import url('../../scada/gateway/styles/theme.css');
 
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;font-family:var(--ff-body);color:var(--tx);background:linear-gradient(135deg,#faf6f0,#f0e8d8 50%,#f5ece0)}

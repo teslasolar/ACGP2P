@@ -2,7 +2,7 @@
   "§": "2.6",
   "🏗️": "⌖",
   "name": "version",
-  "module": "js/version.js",
+  "module": "controls/scada/gateway/scripts/version.js",
 
   "⚙️": { "REPO": "teslasolar/ACGP2P", "BRANCH": "main" },
 

@@ -29,7 +29,7 @@ index/
    <html><head>
      <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
      <title>💬 chat · ACG</title>
-     <link rel="stylesheet" href="../index/section.css">
+     <link rel="stylesheet" href="../controls/scada/gateway/styles/section.css">
    </head><body>
      <main id="section"></main>
      <script type="module">

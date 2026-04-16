@@ -5,8 +5,8 @@
   Copy this file to /{sub}/index.html and change the three placeholders
   in the renderSection({sub, glyph, name, desc}) call at the bottom.
   Every page gets:
-    · the parchment theme                       (../css/theme.css)
-    · the shared section layout                 (../index/section.css)
+    · the parchment theme                       (../controls/scada/gateway/styles/theme.css)
+    · the shared section layout                 (../controls/scada/gateway/styles/section.css)
     · the renderer + mesh bridge wiring         (../index/renderer.js)
     · ../udts.json and ../tags.json auto-loaded (overridable via opts)
     · a live feed of cross-tab events on the acg-mesh BroadcastChannel
@@ -16,7 +16,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{{GLYPH}} {{NAME}} · ACG</title>
-<link rel="stylesheet" href="../index/section.css">
+<link rel="stylesheet" href="../controls/scada/gateway/styles/section.css">
 </head>
 <body>
 <main id="section"></main>

@@ -9,6 +9,9 @@ unified tag plant, and modules plug in to populate / consume slices of it.
 
 ```
 controls/scada/gateway/
+  styles/              🎨  HMI stylesheet bundle (theme + section + style)
+  scripts/             🛰  ES-module runtime (every js/* module the HMIs need)
+  providers/           📋  tag-provider registry (registry.json)
   auth/                🔑  identity module — owns auth.*
     provider.py            top-level (publishes auth.profile + auth.signedIn)
     udts.json   tags.json
@@ -19,6 +22,12 @@ controls/scada/gateway/
     github/               🐙  device-flow OAuth (proxy required)
     google/               🔎  OIDC implicit (stub)
 ```
+
+## What the gateway hosts
+
+Every HMI in the project pulls **scripts**, **styles**, and **tag-provider
+metadata** from this single location, giving the project page-to-page
+consistency on theme, runtime, and namespace ownership.
 
 ## Sibling area
 
@@ -37,4 +46,5 @@ gateway-log viewer at `/gateway-log.html` keeps its short module path.
 - `gateway/scheduler/`     cron-style script execution
 
 Every module follows the same provider contract — drop one in, register it
-in `/providers.json`, and the renderer picks it up automatically.
+in `/controls/scada/gateway/providers/registry.json`, and the renderer
+picks it up automatically.

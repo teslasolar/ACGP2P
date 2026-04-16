@@ -1,7 +1,9 @@
 {
   "§": "P",
   "name": "ACG · provider registry",
-  "desc": "One row per subsystem directory. Each row points at the Jython 2.7 provider module plus its declarative UDT + tag catalogs.  The browser runtime at /js/scada/providers.js mirrors this list.",
+  "desc": "Tag-provider registry hosted by the SCADA gateway. One row per subsystem; each row points at the Jython 2.7 provider module plus its declarative UDT + tag catalogs. The browser runtime at /controls/scada/gateway/scripts/scada/providers.js mirrors this list.",
+  "host": "controls/scada/gateway/",
+  "registry_path": "controls/scada/gateway/providers/registry.json",
 
   "runtime": {
     "jython":  "2.7",
@@ -16,7 +18,7 @@
       "provider": "chat/provider.py",
       "udts": "chat/udts.json",
       "tags": "chat/tags.json",
-      "browser": ["js/config.js", "js/p2p.js", "js/peers.js", "js/chat.js"],
+      "browser": ["controls/scada/gateway/scripts/config.js", "controls/scada/gateway/scripts/p2p.js", "controls/scada/gateway/scripts/peers.js", "controls/scada/gateway/scripts/chat.js"],
       "namespaces": ["chat", "room", "tracker", "peers", "signal"]
     },
     {
@@ -25,7 +27,7 @@
       "provider": "controls/scada/gateway/auth/provider.py",
       "udts": "controls/scada/gateway/auth/udts.json",
       "tags": "controls/scada/gateway/auth/tags.json",
-      "browser": ["js/auth.js"],
+      "browser": ["controls/scada/gateway/scripts/auth.js"],
       "host": "controls/scada/gateway/",
       "subProviders": [
         "controls/scada/gateway/auth/webrtc/",
@@ -42,7 +44,7 @@
       "provider": "controls/scada/gateway/auth/webrtc/provider.py",
       "udts": "controls/scada/gateway/auth/webrtc/udts.json",
       "tags": "controls/scada/gateway/auth/webrtc/tags.json",
-      "browser": ["js/config.js", "js/p2p.js"],
+      "browser": ["controls/scada/gateway/scripts/config.js", "controls/scada/gateway/scripts/p2p.js"],
       "namespaces": ["auth.webrtc"]
     },
     {
@@ -51,7 +53,7 @@
       "provider": "controls/scada/gateway/auth/webtorrent/provider.py",
       "udts": "controls/scada/gateway/auth/webtorrent/udts.json",
       "tags": "controls/scada/gateway/auth/webtorrent/tags.json",
-      "browser": ["js/config.js", "js/p2p.js"],
+      "browser": ["controls/scada/gateway/scripts/config.js", "controls/scada/gateway/scripts/p2p.js"],
       "namespaces": ["auth.webtorrent"]
     },
     {
@@ -62,7 +64,7 @@
       "tags":     "controls/scada/tags.json",
       "specs":    ["controls/scada/00-legend.json", "controls/scada/01-master.json", "controls/scada/02-chat.json", "controls/scada/03-scada.json", "controls/scada/04-sandbox.json"],
       "programs": "controls/scada/programs/",
-      "browser":  ["js/scada/tags.js", "js/scada/providers.js", "js/scada/monitor.js", "js/scada/udt.js"],
+      "browser":  ["controls/scada/gateway/scripts/scada/tags.js", "controls/scada/gateway/scripts/scada/providers.js", "controls/scada/gateway/scripts/scada/monitor.js", "controls/scada/gateway/scripts/scada/udt.js"],
       "namespaces": ["sys", "version"]
     },
     {
@@ -71,7 +73,7 @@
       "provider": "controls/scada/errors/provider.py",
       "udts": "controls/scada/errors/udts.json",
       "tags": "controls/scada/errors/tags.json",
-      "browser": ["js/errors.js"],
+      "browser": ["controls/scada/gateway/scripts/errors.js"],
       "viewer": "gateway-log.html",
       "namespaces": ["errors"]
     },
@@ -108,7 +110,7 @@
       "provider": "controls/sandbox/provider.py",
       "udts": "controls/sandbox/udts.json",
       "tags": "controls/sandbox/tags.json",
-      "browser": ["js/sandbox-bridge.js", "controls/sandbox/shared/mesh-bridge.js", "controls/sandbox/**"],
+      "browser": ["controls/scada/gateway/scripts/sandbox-bridge.js", "controls/sandbox/shared/mesh-bridge.js", "controls/sandbox/**"],
       "namespaces": ["sandbox"]
     }
   ],

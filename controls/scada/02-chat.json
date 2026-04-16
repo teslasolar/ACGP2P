@@ -2,7 +2,7 @@
   "§": 2,
   "🏗️": "💬",
   "name": "Chat",
-  "module": ["js/config.js", "js/p2p.js", "js/peers.js", "js/chat.js"],
+  "module": ["controls/scada/gateway/scripts/config.js", "controls/scada/gateway/scripts/p2p.js", "controls/scada/gateway/scripts/peers.js", "controls/scada/gateway/scripts/chat.js"],
 
   "⚙️": {
     "trackers":  "a[s4]",

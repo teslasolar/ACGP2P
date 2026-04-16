@@ -4,7 +4,7 @@
   "name": "Sandbox",
   "module": [
     "controls/sandbox/shared/mesh-bridge.js",
-    "js/sandbox-bridge.js",
+    "controls/scada/gateway/scripts/sandbox-bridge.js",
     "controls/sandbox/web-llm/**"
   ],
 
