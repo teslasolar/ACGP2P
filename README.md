@@ -74,37 +74,28 @@ picks each one up and commits the merged JSON back to `main`.
 
 ```mermaid
 flowchart LR
-  subgraph browser["🖥️ browser"]
-    CHAT["💬 chat<br/>/js/p2p · peers · chat"]
-    AUTH["🔑 auth"]
-    VER["⌖ version"]
-    ERR["⚠ errors"]
-    SCADA["🖥️ SCADA<br/>/js/scada/*"]
-    SBX["🧪 sandbox/*"]
+  subgraph browser [browser]
+    CHAT[💬 chat]
+    AUTH[🔑 auth]
+    VER[⌖ version]
+    ERR[⚠ errors]
+    SCADA[🖥️ SCADA]
+    SBX[🧪 sandbox]
   end
-  subgraph mesh["🛰️ BroadcastChannel(acg-mesh)"]
-    BUS(("envelope<br/>{source,type,path,value,ts}"))
-  end
-  subgraph db["🗄️ db/tags.json"]
-    DB[("tags.* · _meta")]
-  end
-  subgraph hmi["README HMI"]
-    BADGES["shields.io badges"]
-    FORMS["issue forms"]
-  end
+  BUS((🛰️ acg-mesh))
+  DB[(🗄️ db / tags.json)]
+  BADGES[shields.io badges]
+  FORMS[issue forms]
 
   CHAT --> SCADA
   AUTH --> SCADA
-  VER  --> SCADA
-  ERR  --> SCADA
-  SBX  --> BUS
-  BUS  --> SCADA
-  SCADA -. snapshot .-> DB
+  VER --> SCADA
+  ERR --> SCADA
+  SBX --> BUS
+  BUS --> SCADA
+  SCADA -.-> DB
   DB --> BADGES
-  FORMS -. sync-db.yml .-> DB
-
-  classDef g fill:#e8f4f0,stroke:#1a5c4c,color:#1a2332;
-  class CHAT,AUTH,VER,ERR,SCADA,SBX,BUS,DB,BADGES,FORMS g
+  FORMS -.-> DB
 ```
 
 ---
