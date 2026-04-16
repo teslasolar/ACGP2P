@@ -37,6 +37,10 @@ body>main{max-width:960px;margin:0 auto;padding:18px 20px 40px}
 .ix-feed tbody tr:first-child td{background:var(--tlb);animation:flash .6s ease-out}
 @keyframes flash{from{background:#d4ebe0}to{background:var(--tlb)}}
 
+.ix-hbrow{display:flex;flex-wrap:wrap;gap:6px;min-height:24px;align-items:center}
+.ix-hbpill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;background:var(--sgb);color:var(--sg);font-family:var(--ff-mono);font-size:11px;font-weight:600;border:1px solid rgba(74,136,104,.3);animation:beat 5s infinite}
+@keyframes beat{0%,100%{box-shadow:0 0 0 0 rgba(74,136,104,.4)}50%{box-shadow:0 0 0 4px rgba(74,136,104,0)}}
+
 .ix-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
 .ix-in{flex:1;min-width:180px;padding:7px 11px;background:var(--inp);border:1px solid var(--bd);border-radius:var(--r-sm);font-family:var(--ff-mono);font-size:11px;color:var(--tx);outline:none}
 .ix-in:focus{border-color:var(--tl)}

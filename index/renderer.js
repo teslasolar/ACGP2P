@@ -182,6 +182,28 @@ function buildMeshFeed(root,{sub}){
 
 // ─── main ───
 
+// Heartbeat + refresh cadence (every open index page).
+const HEARTBEAT_MS = 5000;
+const REFRESH_MS   = 5000;
+
+// Track sibling pages we've heard a heartbeat from in the last ~15 s.
+// Key = source (subsystem name), value = {ts, path}.  Rendered into
+// a "live clients" strip above the mesh feed.
+const liveClients = new Map();
+
+function renderClientsBar(host){
+  if(!host)return;
+  const now=Date.now();
+  const alive=[...liveClients.entries()].filter(([,v])=>now-v.ts<15_000)
+    .sort((a,b)=>a[0].localeCompare(b[0]));
+  host.innerHTML=alive.length
+    ?alive.map(([src,v])=>{
+        const age=Math.floor((now-v.ts)/1000);
+        return `<span class="ix-hbpill" title="last heartbeat ${age}s ago · ${v.path||''}">${esc(src)} · ${age}s</span>`;
+      }).join('')
+    :'<span class="ix-muted">no sibling pages seen in last 15 s</span>';
+}
+
 export async function renderSection(opts){
   const{sub,glyph,name,desc}=opts;
   const basePath=opts.basePath||'../';
@@ -191,17 +213,53 @@ export async function renderSection(opts){
 
   const udtsP=fetchJson(opts.udtsPath||'./udts.json').catch(()=>null);
   const tagsP=fetchJson(opts.tagsPath||'./tags.json').catch(()=>null);
-  const dbP  =fetchJson(opts.dbPath  ||basePath+'db/tags.json').catch(()=>null);
-  const [udts,tags,db]=await Promise.all([udtsP,tagsP,dbP]);
+  const dbPath=opts.dbPath||basePath+'db/tags.json';
+  let db=await fetchJson(dbPath).catch(()=>null);
+  const [udts,tags]=await Promise.all([udtsP,tagsP]);
 
   buildUdts(root,udts);
-  buildTags(root,tags,db);
+
+  // Tag section — holds its own container so refresh() can replace it.
+  const tagsHost=document.createElement('div');tagsHost.id='ix-tags';root.append(tagsHost);
+  buildTags(tagsHost,tags,db);
+
+  // Clients bar (before mesh feed) — live heartbeat digest.
+  const clientsSec=el('section',{class:'ix-sec'},[
+    el('h2',{},'💓 Live clients'),
+    el('div',{id:'ix-clients',class:'ix-hbrow'},''),
+  ]);
+  root.append(clientsSec);
+  const clientsHost=document.getElementById('ix-clients');
+
   buildMeshFeed(root,{sub});
 
-  // announce ourselves to the bus so sibling pages see us arrive
-  bridge.publish(sub,'page-open',{path:location.pathname,value:{href:location.href}});
+  // Subscribe to heartbeats → liveClients map
+  bridge.subscribe(env=>{
+    if(env.type==='heartbeat'&&env.source){
+      liveClients.set(env.source,{ts:env.ts||Date.now(),path:env.path||''});
+    }
+  });
+  renderClientsBar(clientsHost);
 
-  // announce on unload too (best-effort)
+  // Announce ourselves + heartbeat every 5s
+  function beat(){
+    bridge.publish(sub,'heartbeat',{path:location.pathname,value:{href:location.href}});
+  }
+  bridge.publish(sub,'page-open',{path:location.pathname,value:{href:location.href}});
+  beat();
+  setInterval(beat,HEARTBEAT_MS);
+
+  // Re-paint clients bar on a separate cadence so age counters tick.
+  setInterval(()=>renderClientsBar(clientsHost),1000);
+
+  // Auto-refresh the tag table every 5s so live values tick.
+  setInterval(async()=>{
+    try{
+      db=await fetchJson(dbPath+'?t='+Date.now());   // cache-bust
+      tagsHost.innerHTML='';buildTags(tagsHost,tags,db);
+    }catch(e){/* keep last render */}
+  },REFRESH_MS);
+
   window.addEventListener('beforeunload',()=>{
     bridge.publish(sub,'page-close',{path:location.pathname});
   });

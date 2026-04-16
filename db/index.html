@@ -38,6 +38,11 @@
   </section>
 
   <section class="ix-sec">
+    <h2>💓 Live clients</h2>
+    <div id="clients" class="ix-hbrow"></div>
+  </section>
+
+  <section class="ix-sec">
     <h2>🛰️ Mesh feed</h2>
     <div class="ix-row">
       <input class="ix-in" id="ping" placeholder="broadcast to sibling tabs…">
@@ -96,13 +101,15 @@ function render() {
   $('meta').textContent = `${rows.length} tag${rows.length===1?'':'s'}${db?._meta?.updatedAt?(' · updated '+fmtTs(db._meta.updatedAt)):''}`;
 }
 
-(async () => {
+async function loadDb(){
   try {
-    const r = await fetch('tags.json', {cache:'no-store'});
+    const r = await fetch('tags.json?t='+Date.now(), {cache:'no-store'});
     db = await r.json();
     render();
   } catch(e) { $('meta').textContent = 'failed to load tags.json: '+e.message }
-})();
+}
+loadDb();
+setInterval(loadDb, 5000);                       // 5 s auto-refresh
 
 $('filter').addEventListener('input', render);
 
@@ -127,7 +134,26 @@ bridge.subscribe(env => {
   while (fb.children.length > 50) fb.removeChild(fb.lastChild);
 });
 
+// Heartbeat + live-clients digest
+const liveClients = new Map();
+bridge.subscribe(env => {
+  if (env.type === 'heartbeat' && env.source) {
+    liveClients.set(env.source, { ts: env.ts||Date.now(), path: env.path||'' });
+  }
+});
+function paintClients(){
+  const now=Date.now();
+  const alive=[...liveClients.entries()].filter(([,v])=>now-v.ts<15000).sort();
+  const host=$('clients');
+  host.innerHTML = alive.length
+    ? alive.map(([src,v])=>{const age=Math.floor((now-v.ts)/1000);return `<span class="ix-hbpill" title="last heartbeat ${age}s ago · ${v.path||''}">${esc(src)} · ${age}s</span>`}).join('')
+    : '<span class="ix-muted">no sibling pages heard in last 15 s</span>';
+}
+function beat(){ bridge.publish('db', 'heartbeat', { path: location.pathname }); }
 bridge.publish('db', 'page-open', { path: location.pathname });
+beat(); setInterval(beat, 5000);
+paintClients(); setInterval(paintClients, 1000);
+
 window.addEventListener('beforeunload', () => bridge.publish('db', 'page-close', { path: location.pathname }));
 </script>
 </body>

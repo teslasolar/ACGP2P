@@ -25,6 +25,11 @@
   <nav class="ix-nav" id="nav"></nav>
 
   <section class="ix-sec">
+    <h2>💓 Live clients</h2>
+    <div id="clients" class="ix-hbrow"></div>
+  </section>
+
+  <section class="ix-sec">
     <h2>🛰️ Live pings across all open pages</h2>
     <div class="ix-row">
       <input class="ix-in" id="ping" placeholder="say hi to sibling tabs…">
@@ -73,8 +78,24 @@ bridge.subscribe(env => {
   while (tb.children.length > 50) tb.removeChild(tb.lastChild);
 });
 
-// announce ourselves
+// Heartbeat + live-clients digest
+const liveClients = new Map();
+bridge.subscribe(env => {
+  if (env.type === 'heartbeat' && env.source) {
+    liveClients.set(env.source, { ts: env.ts||Date.now(), path: env.path||'' });
+  }
+});
+function paintClients(){
+  const now=Date.now();
+  const alive=[...liveClients.entries()].filter(([,v])=>now-v.ts<15000).sort();
+  $('clients').innerHTML = alive.length
+    ? alive.map(([src,v])=>{const age=Math.floor((now-v.ts)/1000);return `<span class="ix-hbpill" title="last heartbeat ${age}s ago · ${v.path||''}">${esc(src)} · ${age}s</span>`}).join('')
+    : '<span class="ix-muted">no sibling pages heard in last 15 s</span>';
+}
+function beat(){ bridge.publish('index', 'heartbeat', { path: location.pathname }); }
 bridge.publish('index', 'page-open', { path: location.pathname });
+beat(); setInterval(beat, 5000);
+paintClients(); setInterval(paintClients, 1000);
 window.addEventListener('beforeunload', () => bridge.publish('index', 'page-close', { path: location.pathname }));
 </script>
 </body>

@@ -4,7 +4,17 @@ import {VERSION} from './scada/providers.js';
 const REPO='teslasolar/ACGP2P';
 const BRANCH='main';
 const CACHE_KEY='acg.version';
-const STALE_MS=5*60*1000;     // 5 min between fresh fetches
+
+// Skip the network if cache is younger than this (prevents re-fetch on
+// every tab-switch).
+const SOFT_TTL   = 90 * 1000;      // 1.5 min
+
+// Flag the pill amber/red if no successful fetch within these windows.
+// GitHub anonymous rate limit is 60/hr; 90 s polling = 40/hr, safe.
+const STALE_MS   = 3 * 60 * 1000;  // 3 min  → amber
+const ERR_MS     = 10 * 60 * 1000; // 10 min → red
+const POLL_MS    = 90 * 1000;      // same as SOFT_TTL
+
 let last=loadCache();
 
 function loadCache(){
@@ -23,12 +33,41 @@ function rel(ts){
   return Math.floor(s/86400)+'d ago';
 }
 
+function classify(){
+  if(!last)return 'error';           // no data at all
+  const age=Date.now()-(last.fetchedAt||0);
+  if(age>ERR_MS)return 'error';      // cache exists but is ancient
+  if(age>STALE_MS)return 'stale';    // cache drifting
+  if(last.rateLimited)return 'stale';
+  return 'ok';
+}
+
 function paint(){
   const el=$('ver');if(!el)return;
-  if(!last){el.textContent='⌖ dev';el.title='no commit data yet';return}
-  el.textContent=`⌖ ${last.sha.slice(0,7)} · ${rel(last.date)}`;
+  const state=classify();
+  el.classList.remove('v-stale','v-error');
+  if(state==='error')el.classList.add('v-error');
+  else if(state==='stale')el.classList.add('v-stale');
+
+  if(!last){
+    el.textContent='⌖ dev';
+    el.title='no commit data yet · GitHub API unreachable';
+    return;
+  }
+
+  const marker = state==='ok' ? '⌖' : state==='stale' ? '⌖❗' : '⌖⚠';
+  el.textContent=`${marker} ${last.sha.slice(0,7)} · ${rel(last.date)}`;
   el.href=last.url;
-  el.title=`${last.msg}\n${new Date(last.date).toLocaleString()}\n(cached ${rel(last.fetchedAt)})`;
+
+  const parts=[
+    last.msg,
+    new Date(last.date).toLocaleString(),
+    `last API check: ${rel(last.fetchedAt||Date.now())}`,
+  ];
+  if(last.rateLimited)parts.push('⚠ GitHub API rate-limited — may be behind');
+  if(state==='stale')parts.push('⚠ cache drifting (>3 min since last successful check)');
+  if(state==='error')parts.push('🔴 no successful check in >10 min');
+  el.title=parts.join('\n');
 }
 
 function publishTags(){
@@ -38,23 +77,24 @@ function publishTags(){
   VERSION.write('committedAt',last.date,{type:'DateTime'});
   VERSION.write('message',last.msg);
   VERSION.write('url',last.url);
+  VERSION.write('rateLimited',!!last.rateLimited);
+  VERSION.write('state',classify());
 }
 
 async function fetchVersion(){
-  // skip network if we have fresh cache
-  if(last&&(Date.now()-last.fetchedAt)<STALE_MS){paint();publishTags();return}
+  // soft TTL: skip if we JUST fetched
+  if(last&&(Date.now()-(last.fetchedAt||0))<SOFT_TTL){paint();publishTags();return}
   const headers={'Accept':'application/vnd.github+json'};
   if(last?.etag)headers['If-None-Match']=last.etag;
   try{
     const r=await fetch(`https://api.github.com/repos/${REPO}/commits/${BRANCH}`,{headers});
-    if(r.status===304){                       // unchanged — just bump fetchedAt
-      last.fetchedAt=Date.now();saveCache(last);paint();publishTags();return;
+    if(r.status===304){                       // unchanged — bump fetchedAt
+      last.fetchedAt=Date.now();last.rateLimited=false;saveCache(last);
+      paint();publishTags();return;
     }
-    if(r.status===403){                       // rate-limited — keep cache
-      if(last){paint();publishTags();$('ver').title='GitHub API rate-limited · showing cached '+last.sha.slice(0,7)}
-      else{$('ver').textContent='⌖ dev';$('ver').title='GitHub API rate-limited · no cache'}
-      VERSION.write('rateLimited',true,{quality:'bad'});
-      return;
+    if(r.status===403){                       // rate-limited — keep cache, flag it
+      if(last){last.rateLimited=true;saveCache(last)}
+      paint();publishTags();return;
     }
     if(!r.ok)throw new Error('HTTP '+r.status);
     const c=await r.json();
@@ -65,19 +105,31 @@ async function fetchVersion(){
       msg:c.commit.message.split('\n')[0],
       etag:r.headers.get('etag')||null,
       fetchedAt:Date.now(),
+      rateLimited:false,
     };
     saveCache(last);paint();publishTags();
-    VERSION.write('rateLimited',false);
   }catch(e){
-    // network error — keep cache if we have one
-    if(last){paint();publishTags();$('ver').title='version fetch failed · cached '+last.sha.slice(0,7)+': '+e.message}
-    else{$('ver').textContent='⌖ dev';$('ver').title='version fetch failed: '+e.message}
+    // network error — keep cache if we have one; classify() will flag it stale
+    paint();publishTags();
+    const el=$('ver');if(el)el.title=(el.title||'')+'\n' + '🔴 '+e.message;
   }
+}
+
+async function refresh(){                      // force a skip-soft-ttl fetch
+  if(last)last.fetchedAt=0;
+  return fetchVersion();
 }
 
 export function startVersion(){
   paint();publishTags();   // show cached immediately
   fetchVersion();
-  setInterval(paint,30000);          // refresh relative time
-  setInterval(fetchVersion,5*60000); // re-poll every 5m (respects cache)
+  setInterval(paint,15_000);       // re-classify + refresh "Nm ago"
+  setInterval(fetchVersion,POLL_MS);
+
+  // click-with-shift forces a refetch (bypass soft TTL); left-click keeps
+  // the normal navigate-to-commit-URL behaviour.
+  const el=$('ver');
+  if(el)el.addEventListener('click',e=>{
+    if(e.shiftKey){e.preventDefault();refresh()}
+  });
 }
