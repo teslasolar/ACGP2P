@@ -2,8 +2,8 @@
 
 Declarative schema for every subsystem, in the compressed glyph style
 from §0. Runtime modules in `/js/scada/`, `/js/*.js` and
-`/sandbox/*/modules/` mirror these files — diverge and the HMI surfaces
-drift (manifest tag with no runtime entry → 🔴).
+`/controls/sandbox/*/modules/` mirror these files — diverge and the HMI
+surfaces drift (manifest tag with no runtime entry → 🔴).
 
 ```
 scada/

@@ -3,9 +3,9 @@
   "🏗️": "🧪",
   "name": "Sandbox",
   "module": [
-    "sandbox/shared/mesh-bridge.js",
+    "controls/sandbox/shared/mesh-bridge.js",
     "js/sandbox-bridge.js",
-    "sandbox/web-llm/**"
+    "controls/sandbox/web-llm/**"
   ],
 
   "🛰️ MeshBridge": {
@@ -15,7 +15,7 @@
   },
 
   "📦🧠 WebLLM": {
-    "module": "sandbox/web-llm/**",
+    "module": "controls/sandbox/web-llm/**",
 
     "⚙️": { "model": "s", "status": "e[idle|loading|ready|error]", "gpu": "b", "progress": "f" },
     "🎤": { "rms": "f", "f0": "f", "pDelta": "f", "sustain": "f", "coherence": "f", "vowel": "e", "energy": "f" },

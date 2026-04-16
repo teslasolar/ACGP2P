@@ -10,7 +10,7 @@
 <div id="section"></div>
 
 <script type="module">
-import {bridge} from '../sandbox/shared/mesh-bridge.js';
+import {bridge} from './sandbox/shared/mesh-bridge.js';
 import {buildDockShell, SUBSYSTEMS} from '../index/renderer.js';
 
 const $  = id => document.getElementById(id);
@@ -45,6 +45,9 @@ const CONTROLS=[
   {id:'plc',      glyph:'🔧', name:'PLC',      status:'ready',
    desc:'GitPLC universal PLC namespace.  UDT templates at /controls/plc/git/, standard at /controls/docs/standards/gitplc/.  Any vendor → UDT → any vendor.  Owns plc.*.',
    href:'plc/'},
+  {id:'sandbox',  glyph:'🧪', name:'Sandbox',  status:'ready',
+   desc:'Browser-only tool workshops (web-llm, voice, VFS, git-lite).  Owns sandbox.*.  BroadcastChannel bridge publishes events into the SCADA tag plant.',
+   href:'sandbox/'},
   {id:'db',       glyph:'🗄️', name:'DB',       status:'ready',
    desc:'Canonical tag snapshot (tags.json) read by the README HMI + shields.io badges.  Merged by .github/workflows/sync-db.yml on every acg-db issue.',
    href:'db/'},

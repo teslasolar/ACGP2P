@@ -9,6 +9,7 @@ controls/
     errors/          ⚠  gateway-log ring buffer · owns errors.*
   hmi/               🖼  ISA-101 operator interface: layers, palette, faceplates
   plc/               🔧  GitPLC universal PLC namespace + UDT templates (git/)
+  sandbox/           🧪  browser-only tool workshops (web-llm, voice, VFS) · owns sandbox.*
   db/                🗄️  tags.json — canonical snapshot read by the README HMI
   docs/standards/    📐  Konomi meta-standard + GitPLC standard (all layers)
 ```
@@ -20,6 +21,6 @@ Siblings (future — room here for more):
 - `controls/routing/`      rule-based tag routing + transformations
 - `controls/pinning/`      "pinned tags" (persist across sessions)
 
-Every control subsystem follows the same contract as /chat, /auth, /sandbox
+Every control subsystem follows the same contract as /chat + /auth
 (see `/index/README.md`): `provider.py` (Jython 2.7) + `udts.json` +
 `tags.json` + `index.html` → rendered via `/index/renderer.js`.

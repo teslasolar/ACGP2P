@@ -107,11 +107,6 @@ flowchart LR
 ├─ index.html            💬  main chat page
 ├─ gateway-log.html      ⚠  Ignition-style log viewer (errors.*)
 ├─ health.html           ⚕  tracker + STUN + GitHub-API health probe
-├─ sandbox/              🧪  browser-only tools
-│   ├─ index.html            launcher
-│   ├─ web-llm/              🧠 voice-powered in-browser LLM
-│   ├─ provider.py           🐍 Jython 2.7 · owns sandbox.*
-│   ├─ udts.json   tags.json
 ├─ chat/                 💬  subsystem plant
 │   ├─ provider.py           owns chat.* room.* tracker.* peers.* signal.*
 │   ├─ udts.json   tags.json
@@ -126,6 +121,8 @@ flowchart LR
 │   │   └─ errors/         ⚠  owns errors.*  (gateway-log area)
 │   ├─ hmi/                🖼  ISA-101 operator interface (layers, palette, faceplates)
 │   ├─ plc/                🔧  GitPLC universal PLC namespace (git/ UDT templates)
+│   ├─ sandbox/            🧪  browser-only tools · owns sandbox.*
+│   │   └─ web-llm/          🧠 voice-powered in-browser LLM
 │   ├─ db/                 🗄️  tags.json (HMI source) · README.md
 │   └─ docs/standards/     📐  Konomi meta-standard + GitPLC standard
 ├─ js/                   runtime · ES modules

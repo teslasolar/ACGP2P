@@ -2,7 +2,7 @@
   "§": "4.2.5",
   "🏗️": "🧰",
   "name": "mcp-tools-engine",
-  "module": "sandbox/web-llm/modules/mcp-tools-engine.js",
+  "module": "controls/sandbox/web-llm/modules/mcp-tools-engine.js",
   "desc": "virtual filesystem + git-lite + fenced-LLM-tool parser/dispatcher",
 
   "📦": {

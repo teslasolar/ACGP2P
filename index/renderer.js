@@ -5,7 +5,7 @@
 // + live tag table.  Pages heartbeat every 5 s on BroadcastChannel
 // "acg-mesh" so open siblings can see each other in the east dock.
 
-import {bridge} from '../sandbox/shared/mesh-bridge.js';
+import {bridge} from '../controls/sandbox/shared/mesh-bridge.js';
 
 // ── catalogues ────────────────────────────────────────────────────────
 export const SUBSYSTEMS=[
@@ -16,7 +16,7 @@ export const SUBSYSTEMS=[
   {sub:'hmi',     glyph:'🖼', name:'hmi',     path:'controls/hmi'},
   {sub:'plc',     glyph:'🔧', name:'plc',     path:'controls/plc'},
   {sub:'db',      glyph:'🗄️', name:'db',      path:'controls/db'},
-  {sub:'sandbox', glyph:'🧪', name:'sandbox', path:'sandbox'},
+  {sub:'sandbox', glyph:'🧪', name:'sandbox', path:'controls/sandbox'},
 ];
 
 const SHELL_LINKS=[

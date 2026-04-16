@@ -76,4 +76,4 @@ renderSection({
 ```
 
 If your subsystem wraps a different path (e.g. the tool-specific SCADA
-in `/sandbox/web-llm/modules/scada/`), pass explicit paths.
+in `/controls/sandbox/web-llm/modules/scada/`), pass explicit paths.

@@ -2,7 +2,7 @@
   "§": "4.2.3",
   "🏗️": "🔧",
   "name": "tools",
-  "module": "sandbox/web-llm/modules/tools.js",
+  "module": "controls/sandbox/web-llm/modules/tools.js",
 
   "📦": { "callCount": "i" },
 

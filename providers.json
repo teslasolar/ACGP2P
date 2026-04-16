@@ -97,11 +97,11 @@
     },
     {
       "id": "🧪 sandbox",
-      "dir": "sandbox/",
-      "provider": "sandbox/provider.py",
-      "udts": "sandbox/udts.json",
-      "tags": "sandbox/tags.json",
-      "browser": ["js/sandbox-bridge.js", "sandbox/shared/mesh-bridge.js", "sandbox/**"],
+      "dir": "controls/sandbox/",
+      "provider": "controls/sandbox/provider.py",
+      "udts": "controls/sandbox/udts.json",
+      "tags": "controls/sandbox/tags.json",
+      "browser": ["js/sandbox-bridge.js", "controls/sandbox/shared/mesh-bridge.js", "controls/sandbox/**"],
       "namespaces": ["sandbox"]
     }
   ],
