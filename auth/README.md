@@ -9,6 +9,8 @@ auth/
   udts.json           general UDTs (Profile)
   tags.json           auth.* tag catalog
   index.html          subsystem index (rendered by /index/renderer.js)
+  webrtc/             📡 cryptographic peer-id identity (no OAuth, no server)
+  webtorrent/         🌊 tracker-based peer discovery (info_hash as bearer)
   discord/            🎮 implicit-grant OAuth (pure browser, no proxy)
   github/             🐙 device flow (requires a CORS proxy)
   google/             🔎 OIDC implicit / id_token (stub · not wired yet)
@@ -19,10 +21,18 @@ auth/
 ```
 auth.profile            Profile UDT · whichever provider succeeded last
 auth.signedIn           bool · derived from auth.profile
+auth.webrtc.*           peer-id identity (anonymous cryptographic)
+auth.webtorrent.*       tracker discovery state (info_hash, trackers[], announce)
 auth.discord.*          discord-specific state (client id, last token age, …)
 auth.github.*           github-specific state (device code in flight, ...)
 auth.google.*           google-specific state
 ```
+
+**Identity vs OAuth.**  `webrtc` + `webtorrent` are *passive* identity
+providers — no human-facing sign-in flow, but the peer id and the tracker
+info_hash function as bearer tokens that prove mesh membership.  Discord
+/ GitHub / Google are traditional OAuth flows that attach a human
+identity (display name, avatar) on top.
 
 ## Sub-provider contract
 

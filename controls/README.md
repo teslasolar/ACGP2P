@@ -6,8 +6,10 @@ its own tag namespace(s), UDTs, Jython 2.7 provider, and subsystem index.
 ```
 controls/
   scada/             🖥️  tag plant · HMI monitor · dense-token specs (§0 — §4)
+    errors/          ⚠  gateway-log ring buffer · owns errors.*
   hmi/               🖼  ISA-101 operator interface: layers, palette, faceplates
   plc/               🔧  GitPLC universal PLC namespace + UDT templates (git/)
+  db/                🗄️  tags.json — canonical snapshot read by the README HMI
   docs/standards/    📐  Konomi meta-standard + GitPLC standard (all layers)
 ```
 
@@ -18,6 +20,6 @@ Siblings (future — room here for more):
 - `controls/routing/`      rule-based tag routing + transformations
 - `controls/pinning/`      "pinned tags" (persist across sessions)
 
-Every control subsystem follows the same contract as /chat, /auth, /errors,
-/sandbox (see `/index/README.md`): `provider.py` (Jython 2.7) + `udts.json`
-+ `tags.json` + `index.html` → rendered via `/index/renderer.js`.
+Every control subsystem follows the same contract as /chat, /auth, /sandbox
+(see `/index/README.md`): `provider.py` (Jython 2.7) + `udts.json` +
+`tags.json` + `index.html` → rendered via `/index/renderer.js`.

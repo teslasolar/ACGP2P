@@ -11,12 +11,12 @@ import {bridge} from '../sandbox/shared/mesh-bridge.js';
 export const SUBSYSTEMS=[
   {sub:'chat',    glyph:'💬', name:'chat',    path:'chat'},
   {sub:'auth',    glyph:'🔑', name:'auth',    path:'auth'},
-  {sub:'errors',  glyph:'⚠',  name:'errors',  path:'errors'},
   {sub:'scada',   glyph:'🖥️', name:'scada',   path:'controls/scada'},
+  {sub:'errors',  glyph:'⚠',  name:'errors',  path:'controls/scada/errors'},
   {sub:'hmi',     glyph:'🖼', name:'hmi',     path:'controls/hmi'},
   {sub:'plc',     glyph:'🔧', name:'plc',     path:'controls/plc'},
+  {sub:'db',      glyph:'🗄️', name:'db',      path:'controls/db'},
   {sub:'sandbox', glyph:'🧪', name:'sandbox', path:'sandbox'},
-  {sub:'db',      glyph:'🗄️', name:'db',      path:'db'},
 ];
 
 const SHELL_LINKS=[
@@ -230,7 +230,7 @@ export async function renderSection(opts){
   paintDesc(docks.m,desc);
   const udtsP=fetchJson(opts.udtsPath||'./udts.json').catch(()=>null);
   const tagsP=fetchJson(opts.tagsPath||'./tags.json').catch(()=>null);
-  const dbPath=opts.dbPath||basePath+'db/tags.json';
+  const dbPath=opts.dbPath||basePath+'controls/db/tags.json';
   let db=await fetchJson(dbPath).catch(()=>null);
   const [udts,tags]=await Promise.all([udtsP,tagsP]);
 

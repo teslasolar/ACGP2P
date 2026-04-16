@@ -18,35 +18,35 @@
 
 ## 📡 Live plant readout
 
-Badges below read [`db/tags.json`](db/tags.json) on every render.  Edit that file
+Badges below read [`controls/db/tags.json`](controls/db/tags.json) on every render.  Edit that file
 (or use one of the [issue forms](#-controls) below) and the HMI updates.
 
 ### 💬 chat
 
-![peers](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/db/tags.json&query=%24.room.peerCount.value&label=room.peerCount&color=1a5c4c&style=flat-square)
-![room](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/db/tags.json&query=%24.room.name.value&label=room&color=1a5c4c&style=flat-square)
-![msgsIn](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/db/tags.json&query=%24.chat.msgsIn.value&label=chat.msgsIn&color=4a8868&style=flat-square)
-![msgsOut](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/db/tags.json&query=%24.chat.msgsOut.value&label=chat.msgsOut&color=4a8868&style=flat-square)
+![peers](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/controls/db/tags.json&query=%24.room.peerCount.value&label=room.peerCount&color=1a5c4c&style=flat-square)
+![room](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/controls/db/tags.json&query=%24.room.name.value&label=room&color=1a5c4c&style=flat-square)
+![msgsIn](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/controls/db/tags.json&query=%24.chat.msgsIn.value&label=chat.msgsIn&color=4a8868&style=flat-square)
+![msgsOut](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/controls/db/tags.json&query=%24.chat.msgsOut.value&label=chat.msgsOut&color=4a8868&style=flat-square)
 
 ### 📡 tracker · signalling
 
-![tracker](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/db/tags.json&query=%24.tracker.state.value&label=tracker.state&color=c47a20&style=flat-square)
-![announces](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/db/tags.json&query=%24.tracker.announces.value&label=tracker.announces&color=c47a20&style=flat-square)
-![offersIn](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/db/tags.json&query=%24.signal.offersIn.value&label=signal.offersIn&color=8d95a0&style=flat-square)
-![answersOut](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/db/tags.json&query=%24.signal.answersOut.value&label=signal.answersOut&color=8d95a0&style=flat-square)
+![tracker](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/controls/db/tags.json&query=%24.tracker.state.value&label=tracker.state&color=c47a20&style=flat-square)
+![announces](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/controls/db/tags.json&query=%24.tracker.announces.value&label=tracker.announces&color=c47a20&style=flat-square)
+![offersIn](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/controls/db/tags.json&query=%24.signal.offersIn.value&label=signal.offersIn&color=8d95a0&style=flat-square)
+![answersOut](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/controls/db/tags.json&query=%24.signal.answersOut.value&label=signal.answersOut&color=8d95a0&style=flat-square)
 
 ### 🔑 identity · ⌖ version
 
-![signedIn](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/db/tags.json&query=%24.auth.signedIn.value&label=auth.signedIn&color=1a5c4c&style=flat-square)
-![sha](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/db/tags.json&query=%24.version.shortSha.value&label=version.shortSha&color=1c2128&style=flat-square)
-![rateLimited](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/db/tags.json&query=%24.version.rateLimited.value&label=version.rateLimited&color=b85c5c&style=flat-square)
+![signedIn](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/controls/db/tags.json&query=%24.auth.signedIn.value&label=auth.signedIn&color=1a5c4c&style=flat-square)
+![sha](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/controls/db/tags.json&query=%24.version.shortSha.value&label=version.shortSha&color=1c2128&style=flat-square)
+![rateLimited](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/controls/db/tags.json&query=%24.version.rateLimited.value&label=version.rateLimited&color=b85c5c&style=flat-square)
 
 ### ⚠ errors · 🧪 sandbox
 
-![errors](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/db/tags.json&query=%24.errors.count.value&label=errors.count&color=b85c5c&style=flat-square)
-![err-ERROR](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/db/tags.json&query=%24.errors.byLevel.ERROR.count.value&label=ERROR&color=b85c5c&style=flat-square)
-![err-WARN](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/db/tags.json&query=%24.errors.byLevel.WARN.count.value&label=WARN&color=c47a20&style=flat-square)
-![sandbox](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/db/tags.json&query=%24.sandbox.bridgeOpen.value&label=sandbox.bridgeOpen&color=6f42c1&style=flat-square)
+![errors](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/controls/db/tags.json&query=%24.errors.count.value&label=errors.count&color=b85c5c&style=flat-square)
+![err-ERROR](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/controls/db/tags.json&query=%24.errors.byLevel.ERROR.count.value&label=ERROR&color=b85c5c&style=flat-square)
+![err-WARN](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/controls/db/tags.json&query=%24.errors.byLevel.WARN.count.value&label=WARN&color=c47a20&style=flat-square)
+![sandbox](https://img.shields.io/badge/dynamic/json?url=https://teslasolar.github.io/ACGP2P/controls/db/tags.json&query=%24.sandbox.bridgeOpen.value&label=sandbox.bridgeOpen&color=6f42c1&style=flat-square)
 
 ---
 
@@ -116,20 +116,23 @@ flowchart LR
 │   ├─ provider.py           owns chat.* room.* tracker.* peers.* signal.*
 │   ├─ udts.json   tags.json
 ├─ auth/                 🔑  owns auth.*
-├─ errors/               ⚠  owns errors.*
-├─ controls/scada/                🖥️  owns sys.* version.* + declarative manifests
-│   ├─ 00-legend.json        glyph + type shorthand (§0)
-│   ├─ 01-master.json        ACGP2P master UDT
-│   ├─ 02-chat.json          💬 subsystem spec
-│   ├─ 03-scada.json         🖥️ subsystem spec
-│   ├─ 04-sandbox.json       🧪 subsystem spec
-│   └─ programs/             per-module dense-glyph specs
+│   ├─ webrtc/              📡 cryptographic peer-id identity
+│   ├─ webtorrent/          🌊 tracker-based peer discovery (info_hash bearer)
+│   ├─ discord/ github/ google/   OAuth sub-providers
+├─ controls/             🎛  control-plane subsystems
+│   ├─ scada/              🖥️  owns sys.* version.* + dense manifests (§0—§4)
+│   │   ├─ 00-legend.json  …  04-sandbox.json       declarative specs
+│   │   ├─ programs/           per-module dense-glyph specs
+│   │   └─ errors/         ⚠  owns errors.*  (gateway-log area)
+│   ├─ hmi/                🖼  ISA-101 operator interface (layers, palette, faceplates)
+│   ├─ plc/                🔧  GitPLC universal PLC namespace (git/ UDT templates)
+│   ├─ db/                 🗄️  tags.json (HMI source) · README.md
+│   └─ docs/standards/     📐  Konomi meta-standard + GitPLC standard
 ├─ js/                   runtime · ES modules
 │   ├─ main.js   ui.js   config.js   p2p.js   peers.js   chat.js
 │   ├─ auth.js   version.js   errors.js   sandbox-bridge.js
 │   └─ scada/           tags.js · providers.js · monitor.js · udt.js
 ├─ css/                  theme.css · style.css
-├─ db/                   tags.json (HMI source) · README.md
 ├─ providers.json        registry of every subsystem provider
 ├─ .github/
 │   ├─ ISSUE_TEMPLATE/   tag-update · log-entry · control-action

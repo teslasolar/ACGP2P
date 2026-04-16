@@ -1,5 +1,5 @@
 name: "🏷️ Tag update"
-description: "Write a single value into the ACG tag DB (db/tags.json)."
+description: "Write a single value into the ACG tag DB (controls/db/tags.json)."
 title: "🏷️ <tag.path> = <value>"
 labels: ["acg-db", "tag-update"]
 body:
@@ -8,7 +8,7 @@ body:
       value: |
         Records one tag write against the live plant.  The sync workflow
         (`.github/workflows/sync-db.yml`) merges the body below into
-        `db/tags.json` and commits to `main`.  Every badge on the README
+        `controls/db/tags.json` and commits to `main`.  Every badge on the README
         that reads that path updates on the next deploy.
 
         See `/providers.json` for the owning provider of each namespace.

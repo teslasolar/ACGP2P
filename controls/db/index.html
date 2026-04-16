@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>🗄️ db · ACG</title>
-<link rel="stylesheet" href="../index/section.css">
+<link rel="stylesheet" href="../../index/section.css">
 </head>
 <body>
 <div id="section"></div>
 
 <script type="module">
-import {bridge} from '../sandbox/shared/mesh-bridge.js';
-import {buildDockShell, SUBSYSTEMS} from '../index/renderer.js';
+import {bridge} from '../../sandbox/shared/mesh-bridge.js';
+import {buildDockShell, SUBSYSTEMS} from '../../index/renderer.js';
 
 const $  = id => document.getElementById(id);
 const el = (tag, attrs={}, children=[]) => {
@@ -28,7 +28,7 @@ const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').rep
 const fmtTs=ts=>ts?new Date(ts).toLocaleTimeString():'—';
 const qDot=q=>({good:'🟢',stale:'🟡',bad:'🔴',uncertain:'⚪'}[q]||'⚪');
 
-const basePath = '../';
+const basePath = '../../';
 const docks = buildDockShell($('section'));
 
 // N
@@ -62,7 +62,7 @@ docks.w.append(
 docks.m.append(
   el('p',{class:'ix-lede'},[
     'Single source of truth that the ',
-    el('a',{href:'../README.md'},'README HMI'),
+    el('a',{href:'../../README.md'},'README HMI'),
     ' reads via shields.io.  Edit tags.json directly or file an issue; both paths feed the same snapshot.',
   ]),
   el('section',{class:'ix-sec'},[

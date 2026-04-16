@@ -2,7 +2,7 @@
   "§": "E.TAGS",
   "🏗️": "⚠",
   "name": "errors · tag catalog",
-  "owner": "errors/provider.py",
+  "owner": "controls/scada/errors/provider.py",
   "namespaces": ["errors"],
   "viewer": "/gateway-log.html",
   "ringSize": 200,

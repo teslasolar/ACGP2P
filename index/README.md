@@ -42,7 +42,7 @@ index/
 3. The renderer will:
    - Fetch `./udts.json` → render a card per UDT (fields + types)
    - Fetch `./tags.json` → render a tag table
-   - Fetch `../db/tags.json` → cross-reference live value + quality + age
+   - Fetch `../controls/db/tags.json` → cross-reference live value + quality + age
    - Open `BroadcastChannel('acg-mesh')` → publish `{source, type:'page-open', …}`
    - Subscribe → show every sibling-page event live at the bottom
 
@@ -71,7 +71,7 @@ renderSection({
   sub, glyph, name, desc,              // required
   udtsPath: './udts.json',             // default
   tagsPath: './tags.json',             // default
-  dbPath:   '../db/tags.json',         // default
+  dbPath:   '../controls/db/tags.json',     // default
 });
 ```
 

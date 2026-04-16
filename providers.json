@@ -26,17 +26,26 @@
       "udts": "auth/udts.json",
       "tags": "auth/tags.json",
       "browser": ["js/auth.js"],
+      "subProviders": ["auth/webrtc/", "auth/webtorrent/", "auth/discord/", "auth/github/", "auth/google/"],
       "namespaces": ["auth"]
     },
     {
-      "id": "⚠ errors",
-      "dir": "errors/",
-      "provider": "errors/provider.py",
-      "udts": "errors/udts.json",
-      "tags": "errors/tags.json",
-      "browser": ["js/errors.js"],
-      "viewer": "gateway-log.html",
-      "namespaces": ["errors"]
+      "id": "📡 auth.webrtc",
+      "dir": "auth/webrtc/",
+      "provider": "auth/webrtc/provider.py",
+      "udts": "auth/webrtc/udts.json",
+      "tags": "auth/webrtc/tags.json",
+      "browser": ["js/config.js", "js/p2p.js"],
+      "namespaces": ["auth.webrtc"]
+    },
+    {
+      "id": "🌊 auth.webtorrent",
+      "dir": "auth/webtorrent/",
+      "provider": "auth/webtorrent/provider.py",
+      "udts": "auth/webtorrent/udts.json",
+      "tags": "auth/webtorrent/tags.json",
+      "browser": ["js/config.js", "js/p2p.js"],
+      "namespaces": ["auth.webtorrent"]
     },
     {
       "id": "🖥️ scada",
@@ -48,6 +57,24 @@
       "programs": "controls/scada/programs/",
       "browser":  ["js/scada/tags.js", "js/scada/providers.js", "js/scada/monitor.js", "js/scada/udt.js"],
       "namespaces": ["sys", "version"]
+    },
+    {
+      "id": "⚠ errors",
+      "dir": "controls/scada/errors/",
+      "provider": "controls/scada/errors/provider.py",
+      "udts": "controls/scada/errors/udts.json",
+      "tags": "controls/scada/errors/tags.json",
+      "browser": ["js/errors.js"],
+      "viewer": "gateway-log.html",
+      "namespaces": ["errors"]
+    },
+    {
+      "id": "🗄️ db",
+      "dir": "controls/db/",
+      "tags": "controls/db/tags.json",
+      "viewer": "controls/db/index.html",
+      "desc": "Canonical tag snapshot read by the README HMI + shields.io badges.",
+      "namespaces": ["*"]
     },
     {
       "id": "🖼 hmi",
