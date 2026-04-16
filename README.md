@@ -110,15 +110,16 @@ flowchart LR
 ├─ chat/                 💬  subsystem plant
 │   ├─ provider.py           owns chat.* room.* tracker.* peers.* signal.*
 │   ├─ udts.json   tags.json
-├─ auth/                 🔑  owns auth.*
-│   ├─ webrtc/              📡 cryptographic peer-id identity
-│   ├─ webtorrent/          🌊 tracker-based peer discovery (info_hash bearer)
-│   ├─ discord/ github/ google/   OAuth sub-providers
 ├─ controls/             🎛  control-plane subsystems
 │   ├─ scada/              🖥️  owns sys.* version.* + dense manifests (§0—§4)
 │   │   ├─ 00-legend.json  …  04-sandbox.json       declarative specs
 │   │   ├─ programs/           per-module dense-glyph specs
-│   │   └─ errors/         ⚠  owns errors.*  (gateway-log area)
+│   │   ├─ errors/         ⚠  owns errors.*  (gateway-log area)
+│   │   └─ gateway/        🛰  SCADA gateway host
+│   │       └─ auth/       🔑  identity module · owns auth.*
+│   │           ├─ webrtc/         📡 cryptographic peer-id identity
+│   │           ├─ webtorrent/     🌊 tracker-based peer discovery (info_hash bearer)
+│   │           └─ discord/ github/ google/   OAuth sub-providers
 │   ├─ hmi/                🖼  ISA-101 operator interface (layers, palette, faceplates)
 │   ├─ plc/                🔧  GitPLC universal PLC namespace (git/ UDT templates)
 │   ├─ sandbox/            🧪  browser-only tools · owns sandbox.*

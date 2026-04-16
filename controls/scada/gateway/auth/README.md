@@ -1,10 +1,10 @@
-# /auth
+# /controls/scada/gateway/auth
 
-Identity + sign-in subsystem.  Owns the `auth.*` namespace; each OAuth
-provider owns its own sub-namespace beneath it.
+Identity + sign-in module hosted by the SCADA gateway.  Owns the `auth.*`
+namespace; each OAuth provider owns its own sub-namespace beneath it.
 
 ```
-auth/
+controls/scada/gateway/auth/
   provider.py         top-level · owns auth.profile + auth.signedIn
   udts.json           general UDTs (Profile)
   tags.json           auth.* tag catalog

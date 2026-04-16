@@ -10,7 +10,7 @@ import {bridge} from '../controls/sandbox/shared/mesh-bridge.js';
 // ── catalogues ────────────────────────────────────────────────────────
 export const SUBSYSTEMS=[
   {sub:'chat',    glyph:'💬', name:'chat',    path:'chat'},
-  {sub:'auth',    glyph:'🔑', name:'auth',    path:'auth'},
+  {sub:'auth',    glyph:'🔑', name:'auth',    path:'controls/scada/gateway/auth'},
   {sub:'scada',   glyph:'🖥️', name:'scada',   path:'controls/scada'},
   {sub:'errors',  glyph:'⚠',  name:'errors',  path:'controls/scada/errors'},
   {sub:'hmi',     glyph:'🖼', name:'hmi',     path:'controls/hmi'},
