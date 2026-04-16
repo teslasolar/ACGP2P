@@ -1,0 +1,37 @@
+{
+  "§": "2.2",
+  "🏗️": "📡",
+  "name": "p2p",
+  "module": "js/p2p.js",
+
+  "📦": {
+    "ws":        "🔌?",
+    "hash":      "s40",
+    "room":      "s",
+    "reTimer":   "timeoutId?",
+    "trackerIdx":"i",
+    "pending":   "m offerId → RTCPeerConnection"
+  },
+
+  "→": [
+    { "name": "mkHash",         "in": "name:s",           "out": "s40",          "flow": "SHA1(\"acg:\"+name) → hex" },
+    { "name": "waitIce",        "in": "pc,ms=4000",       "out": "Promise",      "flow": "pc.iceGatheringState==='complete' ∨ timeout" },
+    { "name": "mkOffers",       "in": "n:i",              "out": "a[{offer_id,offer}]", "flow": "∀ i<n → RTCPC ⊕ wire(🔌,uuid) ⊕ createOffer ⊕ waitIce" },
+    { "name": "onOffer",        "in": "msg:o",            "flow": "RTCPC ⊕ setRemote(offer) ⊕ createAnswer ⊕ waitIce ⊕ ws.send" },
+    { "name": "onAnswer",       "in": "msg:o",            "flow": "pending[offer_id].setRemote(answer)" },
+    { "name": "announce",       "in": "∅",                "flow": "mkOffers(N_OFFERS) → ws.send({action:announce,…})" },
+    { "name": "connectTracker", "in": "url:s",            "out": "Promise<🔌>",  "flow": "new WebSocket ⊕ 6s timeout" },
+    { "name": "join",           "in": "rName:s",          "flow": "close(ws) ⊕ clear(pm,pending) ⊕ ∀ TRACKERS → connectTracker ⊕ announce" },
+    { "name": "bcast",          "in": "msg:o",            "out": "i peerCount", "flow": "∀ 🔌∈pm.dcs.open → dc.send(JSON)" },
+    { "name": "wsReady",        "out": "b",               "flow": "ws ∧ ws.readyState===1" }
+  ],
+
+  "↑🖥️": [
+    "room.name", "room.hash", "room.joinedAt", "room.data",
+    "tracker.current", "tracker.state", "tracker.announces", "tracker.lastAnnounceAt",
+    "signal.last", "signal.offersIn", "signal.answersIn", "signal.answersOut"
+  ],
+  "↓🖥️": [],
+
+  "和": true
+}

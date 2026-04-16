@@ -1,0 +1,61 @@
+{
+  "§": "4.2.5",
+  "🏗️": "🧰",
+  "name": "mcp-tools-engine",
+  "module": "sandbox/web-llm/modules/mcp-tools-engine.js",
+  "desc": "virtual filesystem + git-lite + fenced-LLM-tool parser/dispatcher",
+
+  "📦": {
+    "repo": {
+      "name":    "s",
+      "branch":  "s",
+      "files":   "m path:s → { content:s, mtime:ms }",
+      "commits": "a [{ id:s7, message:s, timestamp:ms, snapshot:o }]",
+      "staged":  "m"
+    }
+  },
+
+  "🏗️": {
+    "VFile":    { "path":"s", "type":"e[html|css|javascript|json|markdown|text|svg|other]", "size":"i", "mtime":"ms" },
+    "Commit":   { "id":"s7", "message":"s", "timestamp":"ms", "files":"i" },
+    "ToolCall": { "name":"e", "args":"o", "ok":"b", "result":"any", "ts":"ms" }
+  },
+
+  "→fs": [
+    { "name": "createFile", "in": "path,content=''", "flow": "files.set ⊕ publish(create_file)" },
+    { "name": "editFile",   "in": "path,content",    "flow": "files.update ⊕ publish(edit_file) ∨ createFile if missing" },
+    { "name": "patchFile",  "in": "path,oldStr,newStr", "flow": "replace ⊕ publish(patch_file)" },
+    { "name": "readFile",   "in": "path",            "out": "{ok,content,type,size}" },
+    { "name": "deleteFile", "in": "path" },
+    { "name": "listFiles",  "in": "prefix='/'",      "out": "{count,files}" },
+    { "name": "searchFiles","in": "query",           "out": "{results,count}" },
+    { "name": "getAllFiles","out": "{path:content,…}" }
+  ],
+
+  "→git": [
+    { "name": "initRepo",       "in": "name",     "flow": "reset files+commits ⊕ publish(init_repo)" },
+    { "name": "commitChanges",  "in": "message",  "out": "{id,message}", "flow": "snapshot ⊕ unshift ⊕ publish(commit)" },
+    { "name": "getLog",         "in": "n=20",     "out": "{commits}" },
+    { "name": "getDiff",        "out": "{added,modified,deleted}" },
+    { "name": "checkout",       "in": "ref",      "flow": "restore snapshot" },
+    { "name": "getRepoState",   "out": "{name,branch,fileCount,files,commitCount}" }
+  ],
+
+  "→preview": [
+    { "name": "getPreviewableFiles", "out": "{files:a[s]}" },
+    { "name": "getPreviewHTML",      "in": "path", "out": "{ok,html}", "flow": "inline same-folder <link css> and <script src> so iframe can run without a server" }
+  ],
+
+  "→llm-tools": [
+    { "name": "parseToolCalls",        "in": "text:s", "out": "a[{name,args}]", "flow": "regex fenced: ```<verb> <arg>\\n<body>\\n```" },
+    { "name": "executeTool",           "in": "name,args",         "out": "result", "flow": "DISPATCH[name] ⊕ publish(tool_call)" },
+    { "name": "buildToolSystemPrompt", "out": "s", "flow": "describes create|edit|delete|patch|preview|commit|list|read|search fenced syntax" }
+  ],
+
+  "⚡dispatch": ["create_file","edit_file","patch_file","delete_file","read_file","list_files","search_files","commit","preview"],
+
+  "↑🛰️": [
+    "create_file","edit_file","patch_file","delete_file","init_repo","commit","checkout","tool_call"
+  ],
+  "和": true
+}
