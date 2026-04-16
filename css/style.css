@@ -7,6 +7,7 @@ body{font-family:var(--ff-body);background:linear-gradient(135deg,#faf6f0,#f0e8d
 .bg.v{background:#1c2128;color:#7ee787;font-family:'JetBrains Mono',monospace;text-decoration:none;letter-spacing:.2px}.bg.v:hover{background:#2d3138;color:#a5f3ae}
 .bg.sc{background:#161b22;color:#79c0ff;font-family:'JetBrains Mono',monospace;border:none;cursor:pointer;letter-spacing:.2px}.bg.sc:hover{background:#2d3138;color:#a6d8ff}
 .bg.sx{background:#161b22;color:#d2a8ff;font-family:'JetBrains Mono',monospace;text-decoration:none;letter-spacing:.2px}.bg.sx:hover{background:#2d3138;color:#e4c8ff}
+.bg.lg{background:var(--amb);color:var(--am);font-family:'JetBrains Mono',monospace;text-decoration:none;letter-spacing:.2px}.bg.lg:hover{background:#faebd0;color:#9c5e15}
 #scada{position:fixed;top:0;right:-620px;width:620px;max-width:100vw;height:100vh;background:#0d1117;color:#c9d1d9;font-family:'JetBrains Mono',monospace;font-size:11px;z-index:1000;display:flex;flex-direction:column;box-shadow:-8px 0 32px rgba(0,0,0,.35);transition:right .22s ease}
 #scada.open{right:0}
 #scada .sc-hd{display:flex;gap:10px;align-items:center;padding:10px 14px;background:#010409;border-bottom:1px solid #30363d;font-size:12px;font-weight:600;color:#e6edf3}
