@@ -17,7 +17,7 @@ $('mId').textContent=meLabel();
 $('jBtn').onclick=()=>join($('rIn').value.trim()||'acg-guild');
 $('cIn').onkeydown=e=>{if(e.key==='Enter')send()};
 $('sBtn').onclick=send;
-$('scBtn').onclick=toggleMonitor;
+// #scBtn replaced with a link to /controls/; Ctrl+. still toggles the SCADA drawer below.
 
 // keyboard: ctrl/cmd+. → toggle SCADA
 window.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='.'){e.preventDefault();toggleMonitor()}});
