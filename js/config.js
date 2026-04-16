@@ -17,3 +17,25 @@ export const N_OFFERS=10;
 export const myId='-ACG001-'+Array.from(crypto.getRandomValues(new Uint8Array(6))).map(b=>b.toString(16).padStart(2,'0')).join('');
 export const myNm=myId.slice(-8);
 export const myEm=['⚒️','🔨','🛠️','⚙️','🔧','📐','🧬','🛡️'][parseInt(myId.slice(-2),16)%8];
+
+/* ═══ OAUTH (configure before use) ═══
+ * Discord: implicit grant works purely in-browser. Set DISCORD.clientId
+ *   and add this origin's URL to the app's OAuth redirects in the Discord
+ *   dev portal (https://discord.com/developers/applications).
+ * GitHub:  OAuth + device flow endpoints do NOT send CORS headers, so a
+ *   tiny proxy is required. Set GITHUB.proxyUrl to a Cloudflare Worker (or
+ *   any backend) that forwards POST /device/code and /access_token to
+ *   github.com and relays the response. Leave proxyUrl empty to disable.
+ */
+export const OAUTH={
+  DISCORD:{
+    clientId:'',                                   // set me
+    redirectUri:location.origin+location.pathname, // this page
+    scope:'identify',
+  },
+  GITHUB:{
+    clientId:'',   // set me (public OAuth app client id)
+    proxyUrl:'',   // set me (e.g. https://acg-gh-proxy.workers.dev)
+    scope:'read:user',
+  },
+};
