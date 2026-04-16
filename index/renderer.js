@@ -8,20 +8,25 @@
 import {bridge} from '../sandbox/shared/mesh-bridge.js';
 
 // Canonical nav order — every subsystem index links to every other.
+// `path` is the directory relative to the site root.  Nav hrefs are
+// composed as `basePath + path + '/'` so pages at any depth resolve
+// siblings correctly.
 export const SUBSYSTEMS=[
-  {sub:'chat',    glyph:'💬', name:'chat'},
-  {sub:'auth',    glyph:'🔑', name:'auth'},
-  {sub:'errors',  glyph:'⚠',  name:'errors'},
-  {sub:'scada',   glyph:'🖥️', name:'scada'},
-  {sub:'sandbox', glyph:'🧪', name:'sandbox'},
-  {sub:'db',      glyph:'🗄️', name:'db'},
+  {sub:'chat',    glyph:'💬', name:'chat',    path:'chat'},
+  {sub:'auth',    glyph:'🔑', name:'auth',    path:'auth'},
+  {sub:'errors',  glyph:'⚠',  name:'errors',  path:'errors'},
+  {sub:'scada',   glyph:'🖥️', name:'scada',   path:'controls/scada'},
+  {sub:'sandbox', glyph:'🧪', name:'sandbox', path:'sandbox'},
+  {sub:'db',      glyph:'🗄️', name:'db',      path:'db'},
 ];
 
+// Top-right shell links (mesh, log, health, scada drawer).  `href` is
+// site-root-relative; basePath is prefixed at render time.
 const SHELL_LINKS=[
-  {href:'../',               label:'⚒ mesh'},
-  {href:'../gateway-log.html',label:'⚠ log'},
-  {href:'../health.html',     label:'⚕ health'},
-  {href:'../#scada',          label:'🖥️ scada drawer'},
+  {href:'',                 label:'⚒ mesh'},
+  {href:'gateway-log.html', label:'⚠ log'},
+  {href:'health.html',      label:'⚕ health'},
+  {href:'#scada',           label:'🖥️ scada drawer'},
 ];
 
 const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -46,10 +51,10 @@ function el(tag,attrs={},children=[]){
 
 // ─── header + nav ───
 
-function buildHeader(root,{sub,glyph,name,desc}){
+function buildHeader(root,{sub,glyph,name,desc,basePath}){
   const hd=el('header',{class:'ix-hd'},[
     el('h1',{class:'ix-logo'},[glyph+' '+name, el('span',{},' · ACG subsystem')]),
-    ...SHELL_LINKS.map(l=>el('a',{class:'ix-shell',href:l.href},l.label)),
+    ...SHELL_LINKS.map(l=>el('a',{class:'ix-shell',href:basePath+l.href},l.label)),
   ]);
   root.append(hd);
   if(desc)root.append(el('p',{class:'ix-lede'},desc));
@@ -57,7 +62,7 @@ function buildHeader(root,{sub,glyph,name,desc}){
   const nav=el('nav',{class:'ix-nav'},
     SUBSYSTEMS.map(s=>el('a',{
       class:'ix-pill'+(s.sub===sub?' on':''),
-      href:`../${s.sub}/`,
+      href:basePath+s.path+'/',
     },[s.glyph+' '+s.name]))
   );
   root.append(nav);
@@ -179,13 +184,14 @@ function buildMeshFeed(root,{sub}){
 
 export async function renderSection(opts){
   const{sub,glyph,name,desc}=opts;
+  const basePath=opts.basePath||'../';
   const root=document.getElementById('section')||document.body;
   root.innerHTML='';
-  buildHeader(root,{sub,glyph,name,desc});
+  buildHeader(root,{sub,glyph,name,desc,basePath});
 
   const udtsP=fetchJson(opts.udtsPath||'./udts.json').catch(()=>null);
   const tagsP=fetchJson(opts.tagsPath||'./tags.json').catch(()=>null);
-  const dbP  =fetchJson(opts.dbPath  ||'../db/tags.json').catch(()=>null);
+  const dbP  =fetchJson(opts.dbPath  ||basePath+'db/tags.json').catch(()=>null);
   const [udts,tags,db]=await Promise.all([udtsP,tagsP,dbP]);
 
   buildUdts(root,udts);

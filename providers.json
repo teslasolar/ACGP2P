@@ -40,10 +40,12 @@
     },
     {
       "id": "🖥️ scada",
-      "dir": "scada/",
-      "provider": "scada/provider.py",
-      "udts":     "scada/03-scada.json",
-      "tags":     "scada/03-scada.json",
+      "dir": "controls/scada/",
+      "provider": "controls/scada/provider.py",
+      "udts":     "controls/scada/udts.json",
+      "tags":     "controls/scada/tags.json",
+      "specs":    ["controls/scada/00-legend.json", "controls/scada/01-master.json", "controls/scada/02-chat.json", "controls/scada/03-scada.json", "controls/scada/04-sandbox.json"],
+      "programs": "controls/scada/programs/",
       "browser":  ["js/scada/tags.js", "js/scada/providers.js", "js/scada/monitor.js", "js/scada/udt.js"],
       "namespaces": ["sys", "version"]
     },

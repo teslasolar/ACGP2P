@@ -2,7 +2,7 @@
 
 ```
 db/tags.json    snapshot of the runtime tag plant — rendered as shields on README
-db/udts.json    UDT index (copy of /scada/00-legend.json + /providers.json)
+db/udts.json    UDT index (copy of /controls/scada/00-legend.json + /providers.json)
 ```
 
 ## Read path (HMI)
@@ -47,7 +47,7 @@ Two routes, pick one:
 ## Compressed-token format (`§0`)
 
 Every tag write can also be expressed in the dense glyph spec from
-`scada/00-legend.json`.  Example:
+`controls/scada/00-legend.json`.  Example:
 
 ```
 🏷️ room.peerCount  = 7                🟢 type:Counter  ts:now

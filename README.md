@@ -117,7 +117,7 @@ flowchart LR
 │   ├─ udts.json   tags.json
 ├─ auth/                 🔑  owns auth.*
 ├─ errors/               ⚠  owns errors.*
-├─ scada/                🖥️  owns sys.* version.* + declarative manifests
+├─ controls/scada/                🖥️  owns sys.* version.* + declarative manifests
 │   ├─ 00-legend.json        glyph + type shorthand (§0)
 │   ├─ 01-master.json        ACGP2P master UDT
 │   ├─ 02-chat.json          💬 subsystem spec
@@ -127,7 +127,7 @@ flowchart LR
 ├─ js/                   runtime · ES modules
 │   ├─ main.js   ui.js   config.js   p2p.js   peers.js   chat.js
 │   ├─ auth.js   version.js   errors.js   sandbox-bridge.js
-│   └─ scada/  tags.js · providers.js · monitor.js · udt.js
+│   └─ scada/           tags.js · providers.js · monitor.js · udt.js
 ├─ css/                  theme.css · style.css
 ├─ db/                   tags.json (HMI source) · README.md
 ├─ providers.json        registry of every subsystem provider
@@ -140,7 +140,7 @@ flowchart LR
 
 ## 🌐 Glyphs · type shorthand
 
-See [`scada/00-legend.json`](scada/00-legend.json) for the full decompressor.
+See [`controls/scada/00-legend.json`](controls/scada/00-legend.json) for the full decompressor.
 Every manifest in this repo uses the same grammar:
 
 | glyph | meaning | glyph | meaning |
