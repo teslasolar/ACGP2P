@@ -50,6 +50,25 @@
       "namespaces": ["sys", "version"]
     },
     {
+      "id": "🖼 hmi",
+      "dir": "controls/hmi/",
+      "provider": "controls/hmi/provider.py",
+      "udts":     "controls/hmi/udts.json",
+      "tags":     "controls/hmi/tags.json",
+      "standards":["controls/docs/standards/konomi/isa101/"],
+      "namespaces": ["hmi"]
+    },
+    {
+      "id": "🔧 plc",
+      "dir": "controls/plc/",
+      "provider": "controls/plc/provider.py",
+      "udts":     "controls/plc/udts.json",
+      "tags":     "controls/plc/tags.json",
+      "templates":"controls/plc/git/",
+      "standards":["controls/docs/standards/gitplc/"],
+      "namespaces": ["plc"]
+    },
+    {
       "id": "🧪 sandbox",
       "dir": "sandbox/",
       "provider": "sandbox/provider.py",

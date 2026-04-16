@@ -13,6 +13,8 @@ export const SUBSYSTEMS=[
   {sub:'auth',    glyph:'🔑', name:'auth',    path:'auth'},
   {sub:'errors',  glyph:'⚠',  name:'errors',  path:'errors'},
   {sub:'scada',   glyph:'🖥️', name:'scada',   path:'controls/scada'},
+  {sub:'hmi',     glyph:'🖼', name:'hmi',     path:'controls/hmi'},
+  {sub:'plc',     glyph:'🔧', name:'plc',     path:'controls/plc'},
   {sub:'sandbox', glyph:'🧪', name:'sandbox', path:'sandbox'},
   {sub:'db',      glyph:'🗄️', name:'db',      path:'db'},
 ];
