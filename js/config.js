@@ -1,10 +1,12 @@
+// Order = fallback priority.  Confirmed-working (per /health.html probe)
+// go first so join() lands on its feet inside one RTT.
 export const TRACKERS=[
-  'wss://tracker.openwebtorrent.com',
-  'wss://tracker.webtorrent.dev',
-  'wss://tracker.btorrent.xyz',
+  'wss://tracker.openwebtorrent.com',   // ✓ ~400 ms
+  'wss://tracker.webtorrent.dev',       // ✓ ~700 ms
   'wss://tracker.files.fm:7073/announce',
   'wss://tracker.novage.com.ua',
   'wss://tracker.sloppyta.co:443/announce',
+  'wss://tracker.btorrent.xyz',         // ✗ as of last probe
 ];
 
 export const ICE={iceServers:[
