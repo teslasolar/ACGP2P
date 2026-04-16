@@ -5,7 +5,7 @@ import {send} from './chat.js';
 import {join,announce,wsReady} from './p2p.js';
 import {startVersion} from './version.js';
 import {startAuth,onProfileChange,getProfile} from './auth.js';
-import {startMonitor,toggleMonitor} from './scada/monitor.js';
+import {startMonitor,toggle as toggleMonitor} from './scada/monitor.js';
 import {SYS} from './scada/providers.js';
 import {startSandboxBridge} from './sandbox-bridge.js';
 import {startErrorCapture} from './errors.js';
