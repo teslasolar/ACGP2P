@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🗄️ db · ACG</title>
+<link rel="stylesheet" href="../index/section.css">
+</head>
+<body>
+<main id="section">
+  <header class="ix-hd">
+    <h1 class="ix-logo">🗄️ db<span> · tag snapshot source</span></h1>
+    <a class="ix-shell" href="../">⚒ mesh</a>
+    <a class="ix-shell" href="../gateway-log.html">⚠ log</a>
+    <a class="ix-shell" href="../health.html">⚕ health</a>
+    <a class="ix-shell" href="../#scada">🖥️ scada drawer</a>
+  </header>
+  <p class="ix-lede">
+    Single source of truth that the <a href="../README.md">README HMI</a>
+    reads via <code>shields.io</code>.  Every badge on the landing page
+    is a <code>dynamic/json</code> query against <code>db/tags.json</code>.
+    Edit that file directly, or file one of the <a href="../.github/ISSUE_TEMPLATE/tag-update.yml">issue forms</a>
+    and let the sync workflow commit it for you.
+  </p>
+
+  <nav class="ix-nav" id="nav"></nav>
+
+  <section class="ix-sec">
+    <h2>🏷️ Live snapshot</h2>
+    <div class="ix-row">
+      <input class="ix-in" id="filter" placeholder="filter path… (e.g. room., errors.)" spellcheck="false">
+      <span class="ix-muted" id="meta">loading…</span>
+    </div>
+    <table class="ix-tbl" id="tbl">
+      <thead><tr><th>path</th><th>value</th><th>quality</th><th>type</th><th>updated</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <section class="ix-sec">
+    <h2>🛰️ Mesh feed</h2>
+    <div class="ix-row">
+      <input class="ix-in" id="ping" placeholder="broadcast to sibling tabs…">
+      <button class="ix-btn" id="send">📣 broadcast</button>
+    </div>
+    <table class="ix-tbl ix-feed" id="feed">
+      <thead><tr><th>ts</th><th>source</th><th>type</th><th>path</th><th>value</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+</main>
+
+<script type="module">
+import {bridge} from '../sandbox/shared/mesh-bridge.js';
+import {SUBSYSTEMS} from '../index/renderer.js';
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const fmtTs = ts => ts ? new Date(ts).toLocaleTimeString() : '—';
+const qDot = q => ({good:'🟢',stale:'🟡',bad:'🔴',uncertain:'⚪'}[q]||'⚪');
+
+$('nav').innerHTML = SUBSYSTEMS.map(s =>
+  `<a class="ix-pill" href="../${s.sub}/">${s.glyph} ${s.name}</a>`
+).join('');
+
+let db = null;
+
+function flatten(obj, prefix='') {
+  const out = [];
+  for (const [k, v] of Object.entries(obj||{})) {
+    if (k === '_meta') continue;
+    const p = prefix ? prefix + '.' + k : k;
+    if (v && typeof v === 'object' && 'value' in v && 'quality' in v) {
+      out.push([p, v]);
+    } else if (v && typeof v === 'object') {
+      out.push(...flatten(v, p));
+    }
+  }
+  return out;
+}
+
+function render() {
+  const q = ($('filter').value || '').toLowerCase().trim();
+  const rows = flatten(db).filter(([p]) => !q || p.toLowerCase().includes(q));
+  const tb = $('tbl').querySelector('tbody');
+  tb.innerHTML = rows.map(([p, t]) => {
+    const v = typeof t.value === 'object' ? JSON.stringify(t.value) : String(t.value);
+    return `<tr>
+      <td><code>${esc(p)}</code></td>
+      <td class="ix-v">${esc(v)}</td>
+      <td>${qDot(t.quality)} ${esc(t.quality||'')}</td>
+      <td class="ix-muted">${esc(t.type||'')}</td>
+      <td class="ix-muted">${fmtTs(t.ts)}</td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="5" class="ix-muted" style="text-align:center;padding:20px">no matches</td></tr>';
+  $('meta').textContent = `${rows.length} tag${rows.length===1?'':'s'}${db?._meta?.updatedAt?(' · updated '+fmtTs(db._meta.updatedAt)):''}`;
+}
+
+(async () => {
+  try {
+    const r = await fetch('tags.json', {cache:'no-store'});
+    db = await r.json();
+    render();
+  } catch(e) { $('meta').textContent = 'failed to load tags.json: '+e.message }
+})();
+
+$('filter').addEventListener('input', render);
+
+// mesh feed + broadcast (same pattern as /index/index.html)
+$('send').onclick = () => {
+  const text = $('ping').value.trim() || 'ping';
+  bridge.publish('db', 'ping', { path: 'broadcast', value: text });
+  $('ping').value = '';
+};
+$('ping').addEventListener('keydown', e => { if (e.key==='Enter') $('send').click() });
+
+const fb = $('feed').querySelector('tbody');
+bridge.subscribe(env => {
+  const v = typeof env.value === 'object' ? JSON.stringify(env.value) : (env.value ?? '');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td class="ix-muted">${fmtTs(env.ts)}</td>
+    <td><code>${esc(env.source||'?')}</code></td>
+    <td>${esc(env.type||'')}</td>
+    <td><code>${esc(env.path||'')}</code></td>
+    <td class="ix-v">${esc(v)}</td>`;
+  fb.prepend(tr);
+  while (fb.children.length > 50) fb.removeChild(fb.lastChild);
+});
+
+bridge.publish('db', 'page-open', { path: location.pathname });
+window.addEventListener('beforeunload', () => bridge.publish('db', 'page-close', { path: location.pathname }));
+</script>
+</body>
+</html>

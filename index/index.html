@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>⚒ ACG · subsystem index</title>
+<link rel="stylesheet" href="section.css">
+</head>
+<body>
+<main id="section">
+  <header class="ix-hd">
+    <h1 class="ix-logo">⚒ ACG directory<span> · subsystem index</span></h1>
+    <a class="ix-shell" href="../">⚒ mesh</a>
+    <a class="ix-shell" href="../gateway-log.html">⚠ log</a>
+    <a class="ix-shell" href="../health.html">⚕ health</a>
+    <a class="ix-shell" href="../#scada">🖥️ scada</a>
+  </header>
+  <p class="ix-lede">
+    Each subsystem exposes its UDTs, tag catalog, and a live cross-tab
+    mesh feed at <code>/{sub}/</code>.  Pages talk to each other over
+    <code>BroadcastChannel("acg-mesh")</code>; opening two in parallel
+    proves the flow in one click.
+  </p>
+
+  <nav class="ix-nav" id="nav"></nav>
+
+  <section class="ix-sec">
+    <h2>🛰️ Live pings across all open pages</h2>
+    <div class="ix-row">
+      <input class="ix-in" id="ping" placeholder="say hi to sibling tabs…">
+      <button class="ix-btn" id="send">📣 broadcast</button>
+    </div>
+    <table class="ix-tbl ix-feed" id="feed">
+      <thead><tr><th>ts</th><th>source</th><th>type</th><th>path</th><th>value</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+</main>
+
+<script type="module">
+import {bridge} from '../sandbox/shared/mesh-bridge.js';
+import {SUBSYSTEMS} from './renderer.js';
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const fmtTs = ts => ts ? new Date(ts).toLocaleTimeString() : '—';
+
+// Paint the nav
+$('nav').innerHTML = SUBSYSTEMS.map(s =>
+  `<a class="ix-pill" href="../${s.sub}/">${s.glyph} ${s.name}</a>`
+).join('');
+
+// Broadcast widget
+$('send').onclick = () => {
+  const text = $('ping').value.trim() || 'ping';
+  bridge.publish('index', 'ping', { path: 'broadcast', value: text });
+  $('ping').value = '';
+};
+$('ping').addEventListener('keydown', e => { if (e.key==='Enter') $('send').click() });
+
+// Live feed
+const tb = $('feed').querySelector('tbody');
+bridge.subscribe(env => {
+  const v = typeof env.value === 'object' ? JSON.stringify(env.value) : (env.value ?? '');
+  const tr = document.createElement('tr');
+  tr.innerHTML =
+    `<td class="ix-muted">${fmtTs(env.ts)}</td>`+
+    `<td><code>${esc(env.source||'?')}</code></td>`+
+    `<td>${esc(env.type||'')}</td>`+
+    `<td><code>${esc(env.path||'')}</code></td>`+
+    `<td class="ix-v">${esc(v)}</td>`;
+  tb.prepend(tr);
+  while (tb.children.length > 50) tb.removeChild(tb.lastChild);
+});
+
+// announce ourselves
+bridge.publish('index', 'page-open', { path: location.pathname });
+window.addEventListener('beforeunload', () => bridge.publish('index', 'page-close', { path: location.pathname }));
+</script>
+</body>
+</html>
