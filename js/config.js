@@ -1,8 +1,10 @@
 export const TRACKERS=[
   'wss://tracker.openwebtorrent.com',
-  'wss://tracker.btorrent.xyz',
   'wss://tracker.webtorrent.dev',
-  'wss://tracker.fastcast.nz',
+  'wss://tracker.btorrent.xyz',
+  'wss://tracker.files.fm:7073/announce',
+  'wss://tracker.novage.com.ua',
+  'wss://tracker.sloppyta.co:443/announce',
 ];
 
 export const ICE={iceServers:[
