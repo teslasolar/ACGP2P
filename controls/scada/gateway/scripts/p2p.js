@@ -9,6 +9,11 @@ let ws=null,hash=null,room='',reTimer=null;
 let trackerIdx=0;
 const pending=new Map();
 
+// Unanswered offers expire after this window so we don't leak
+// RTCPeerConnection objects — Chrome caps at ~500 per document and
+// 10 offers per 30 s re-announce will hit that in minutes.
+const PENDING_TTL_MS=60000;
+
 async function mkHash(name){
   const buf=await crypto.subtle.digest('SHA-1',new TextEncoder().encode('acg:'+name));
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
@@ -46,6 +51,15 @@ export async function mkOffers(n){
     await waitIce(pc);
     offers.push({offer_id:oid,offer:{type:'offer',sdp:pc.localDescription.sdp}});
     pending.set(oid,pc);
+    // expire the pending PC if no answer arrives in PENDING_TTL_MS.
+    // Answered offers are removed in onAnswer() — their PCs stay alive
+    // via the open data channel tracked in pm (see peers.js).
+    setTimeout(()=>{
+      if(!pending.has(oid))return;
+      pending.delete(oid);
+      const st=pc.connectionState;
+      if(st!=='connected'&&st!=='connecting')try{pc.close()}catch(e){}
+    },PENDING_TTL_MS);
   }
   return offers;
 }
@@ -75,6 +89,8 @@ async function onOffer(msg){
 async function onAnswer(msg){
   const pc=pending.get(msg.offer_id);
   if(!pc){log('unknown offer_id','wr');return}
+  // matched — the PC lives on via its open DataChannel (tracked in pm).
+  pending.delete(msg.offer_id);
   log('← answer for '+msg.offer_id.slice(0,8),'hi');
   SIGNAL.write('last',mkUDT('SignalEvent',{kind:'answer',dir:'in',offerId:msg.offer_id,ts:Date.now()}));
   SIGNAL.inc('answersIn');
@@ -113,6 +129,8 @@ export function connectTracker(trackerUrl){
 export async function join(rName){
   if(ws){ws.onclose=null;ws.onerror=null;try{ws.close()}catch(e){}}
   if(reTimer)clearTimeout(reTimer);
+  // close every leftover pending PC before we clear the map
+  for(const[,pc]of pending)try{pc.close()}catch(e){}
   pending.clear();
   for(const[,info]of pm)for(const dc of info.dcs)try{dc.close()}catch(e){}
   pm.clear();PEERS.clear();updPeers();

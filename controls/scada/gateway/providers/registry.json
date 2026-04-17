@@ -113,6 +113,11 @@
       "udts": "controls/sandbox/udts.json",
       "tags": "controls/sandbox/tags.json",
       "browser": ["controls/scada/gateway/scripts/sandbox-bridge.js", "controls/sandbox/shared/mesh-bridge.js", "controls/sandbox/**"],
+      "tools": [
+        {"id":"🧠 web-llm",    "dir":"controls/sandbox/web-llm/",    "status":"ready"},
+        {"id":"🖍 whiteboard", "dir":"controls/sandbox/whiteboard/", "status":"ready",
+         "namespaces":["sandbox.whiteboard"]}
+      ],
       "namespaces": ["sandbox"]
     }
   ],
