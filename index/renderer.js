@@ -1,18 +1,27 @@
 // ═══ ACG subsystem-index renderer ═══
 // Each /{sub}/index.html calls renderSection({sub, glyph, name}).  The
 // renderer paints a five-dock shell (north, west, main, east, south)
-// identical across every subsystem, then fills the main dock with UDTs
-// + live tag table.  Pages heartbeat every 5 s on BroadcastChannel
-// "acg-mesh" so open siblings can see each other in the east dock.
+// identical across every subsystem.  The main dock splits into two
+// tab views: 🏗️ UDTs and 🏷️ Tags.  Pages heartbeat every 5 s on
+// BroadcastChannel "acg-mesh" so open siblings can see each other.
 
 import {bridge} from '../controls/sandbox/shared/mesh-bridge.js';
 
 // ── catalogues ────────────────────────────────────────────────────────
+// Children render as a collapsible <details> group in the west dock.
+// Every subsystem resolves to /{path}/ (trailing slash added by paintWest).
 export const SUBSYSTEMS=[
   {sub:'chat',    glyph:'💬', name:'chat',    path:'controls/hmi/chat'},
-  {sub:'auth',    glyph:'🔑', name:'auth',    path:'controls/scada/gateway/auth'},
-  {sub:'scada',   glyph:'🖥️', name:'scada',   path:'controls/scada'},
-  {sub:'errors',  glyph:'⚠',  name:'errors',  path:'controls/scada/errors'},
+  {sub:'scada',   glyph:'🖥️', name:'scada',   path:'controls/scada', children:[
+    {sub:'errors',  glyph:'⚠',  name:'errors',  path:'controls/scada/errors'},
+  ]},
+  {sub:'auth',    glyph:'🔑', name:'auth',    path:'controls/scada/gateway/auth', children:[
+    {sub:'auth.webrtc',     glyph:'📡', name:'webrtc',     path:'controls/scada/gateway/auth/webrtc'},
+    {sub:'auth.webtorrent', glyph:'🌊', name:'webtorrent', path:'controls/scada/gateway/auth/webtorrent'},
+    {sub:'auth.discord',    glyph:'🎮', name:'discord',    path:'controls/scada/gateway/auth/discord'},
+    {sub:'auth.github',     glyph:'🐙', name:'github',     path:'controls/scada/gateway/auth/github'},
+    {sub:'auth.google',     glyph:'🔎', name:'google',     path:'controls/scada/gateway/auth/google'},
+  ]},
   {sub:'hmi',     glyph:'🖼', name:'hmi',     path:'controls/hmi'},
   {sub:'plc',     glyph:'🔧', name:'plc',     path:'controls/plc'},
   {sub:'db',      glyph:'🗄️', name:'db',      path:'controls/db'},
@@ -29,6 +38,7 @@ const SHELL_LINKS=[
 const HEARTBEAT_MS = 5000;
 const REFRESH_MS   = 5000;
 const CLIENT_TTL   = 15000;
+const LS_TAB_KEY   = 'acg.ix.tab';
 
 // ── utilities ────────────────────────────────────────────────────────
 const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -74,17 +84,59 @@ function paintNorth(host,{glyph,name,basePath}){
   host.append(shell);
 }
 
-function paintWest(host,{sub,basePath}){
-  const nav=el('nav',{class:'dock-w-nav'},
-    SUBSYSTEMS.map(s=>el('a',{
-      class:s.sub===sub?'on':'',
+// ── west dock: subsystem nav with collapsible children ───────────────
+// Each SUBSYSTEMS entry renders as either:
+//   - flat <a> row (no children), or
+//   - <details> dropdown whose <summary> is the parent anchor and whose
+//     body lists the children (one <a> each, visually indented).
+// The current subsystem is marked `.on`; if the current subsystem is a
+// child, its parent group is also opened by default.
+function navAnchor({sub,glyph,name,path},{activeSub,basePath,indent}){
+  const a=el('a',{
+    class:(sub===activeSub?'on':'')+(indent?' dock-w-sub':''),
+    href:basePath+path+'/',
+  },[glyph+' '+name]);
+  return a;
+}
+
+function paintWest(host,{sub:activeSub,basePath}){
+  host.append(el('h4',{},'Subsystems'));
+  const nav=el('nav',{class:'dock-w-nav'});
+
+  for(const s of SUBSYSTEMS){
+    if(!s.children||!s.children.length){
+      nav.append(navAnchor(s,{activeSub,basePath,indent:false}));
+      continue;
+    }
+    const childActive=s.children.some(c=>c.sub===activeSub);
+    const parentActive=s.sub===activeSub;
+    const open=childActive||parentActive;
+
+    const details=el('details',{class:'dock-w-group'+(open?' open':'')});
+    if(open)details.setAttribute('open','');
+
+    const summary=el('summary',{class:'dock-w-summary'+(parentActive?' on':'')},
+      [s.glyph+' '+s.name]
+    );
+    details.append(summary);
+
+    // Parent page link (clicking the caret toggles; clicking text here
+    // navigates — we put it as the first child under the summary)
+    const parentLink=el('a',{
+      class:'dock-w-parent-link'+(parentActive?' on':''),
       href:basePath+s.path+'/',
-    },[s.glyph+' '+s.name]))
-  );
-  host.append(el('h4',{},'Subsystems'),nav);
+    },['open '+s.name+' overview']);
+    const kids=el('div',{class:'dock-w-subs'});
+    kids.append(parentLink);
+    for(const c of s.children){
+      kids.append(navAnchor(c,{activeSub,basePath,indent:true}));
+    }
+    details.append(kids);
+    nav.append(details);
+  }
+  host.append(nav);
 
   host.append(el('hr',{class:'dock-sep'}));
-
   host.append(el('h4',{},'Controls'));
   host.append(el('div',{class:'dock-w-actions'},[
     el('a',{href:basePath+'.github/ISSUE_TEMPLATE/tag-update.yml'},'🏷️ write tag'),
@@ -93,12 +145,13 @@ function paintWest(host,{sub,basePath}){
   ]));
 }
 
-// ── main dock paints ─────────────────────────────────────────────────
+// ── main dock: description + tabbed UDTs / Tags views ────────────────
 function paintDesc(host,desc){
   if(desc)host.append(el('p',{class:'ix-lede'},desc));
 }
 
 function paintUdts(host,udts){
+  host.innerHTML='';
   const sec=el('section',{class:'ix-sec'});
   sec.append(el('h2',{},'🏗️ UDTs'));
   if(!udts||!udts.types||!Object.keys(udts.types).length){
@@ -156,6 +209,35 @@ function paintTags(host,tags,liveDb){
   tbl.append(tb);sec.append(tbl);
   if(tags.namespaces)sec.append(el('p',{class:'ix-muted'},'namespaces: '+tags.namespaces.join(', ')));
   host.append(sec);
+}
+
+// Build the tab bar + two panes; return {udtsHost, tagsHost, setTab}.
+function paintViews(host){
+  const tabs=el('nav',{class:'ix-tabs'});
+  const tabUdts=el('button',{class:'ix-tab',type:'button','data-view':'udts'},'🏗️ UDTs');
+  const tabTags=el('button',{class:'ix-tab',type:'button','data-view':'tags'},'🏷️ Tags');
+  tabs.append(tabUdts,tabTags);
+  host.append(tabs);
+
+  const udtsHost=el('div',{class:'ix-pane','data-view':'udts'});
+  const tagsHost=el('div',{class:'ix-pane','data-view':'tags'});
+  host.append(udtsHost,tagsHost);
+
+  function setTab(name){
+    const t=(name==='tags'?'tags':'udts');
+    tabUdts.classList.toggle('on',t==='udts');
+    tabTags.classList.toggle('on',t==='tags');
+    udtsHost.hidden=(t!=='udts');
+    tagsHost.hidden=(t!=='tags');
+    try{localStorage.setItem(LS_TAB_KEY,t)}catch(e){}
+  }
+  tabUdts.addEventListener('click',()=>setTab('udts'));
+  tabTags.addEventListener('click',()=>setTab('tags'));
+
+  const saved=(()=>{try{return localStorage.getItem(LS_TAB_KEY)}catch(e){return null}})();
+  setTab(saved||'udts');
+
+  return{udtsHost,tagsHost,setTab};
 }
 
 // ── east dock: live clients + broadcast ──────────────────────────────
@@ -228,14 +310,15 @@ export async function renderSection(opts){
   paintSouth(docks.s);
 
   paintDesc(docks.m,desc);
+  const{udtsHost,tagsHost}=paintViews(docks.m);
+
   const udtsP=fetchJson(opts.udtsPath||'./udts.json').catch(()=>null);
   const tagsP=fetchJson(opts.tagsPath||'./tags.json').catch(()=>null);
   const dbPath=opts.dbPath||basePath+'controls/db/tags.json';
   let db=await fetchJson(dbPath).catch(()=>null);
   const [udts,tags]=await Promise.all([udtsP,tagsP]);
 
-  paintUdts(docks.m,udts);
-  const tagsHost=el('div',{id:'ix-tags'});docks.m.append(tagsHost);
+  paintUdts(udtsHost,udts);
   paintTags(tagsHost,tags,db);
 
   // bus: heartbeats → live clients, every envelope → footer ticker

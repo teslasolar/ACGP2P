@@ -23,6 +23,22 @@ html,body{height:100vh;overflow:hidden;background:linear-gradient(135deg,#faf6f0
 .dock-w-actions a{padding:6px 10px;border-radius:var(--r-sm);border:1px solid var(--bd);background:var(--inp);color:var(--dm);font-size:11px;text-decoration:none;font-family:var(--ff-body);font-weight:600}
 .dock-w-actions a:hover{border-color:var(--tl);color:var(--tl)}
 
+/* ─── west-dock collapsible groups (e.g. auth → webrtc/webtorrent/discord/github/google) ─── */
+.dock-w-group{background:var(--bg);border:1px solid var(--bd);border-radius:var(--r-sm)}
+.dock-w-group[open]{background:var(--card);border-color:var(--bd2)}
+.dock-w-summary{list-style:none;cursor:pointer;padding:6px 10px;font-family:var(--ff-mono);font-size:11px;font-weight:600;color:var(--dm);display:flex;align-items:center;gap:6px;border-radius:var(--r-sm)}
+.dock-w-summary::-webkit-details-marker{display:none}
+.dock-w-summary::before{content:"▸";display:inline-block;width:10px;font-family:var(--ff-mono);color:var(--ft);transition:transform .12s ease}
+.dock-w-group[open] .dock-w-summary::before{transform:rotate(90deg)}
+.dock-w-summary:hover{color:var(--tl);background:var(--card)}
+.dock-w-summary.on{color:var(--tl);background:var(--tlb)}
+.dock-w-subs{display:flex;flex-direction:column;gap:2px;padding:2px 4px 4px 18px;border-left:1px dashed var(--bd2);margin-left:12px}
+.dock-w-subs a{padding:4px 8px;font-size:10px;border-radius:var(--r-sm);color:var(--dm);font-family:var(--ff-mono);text-decoration:none;font-weight:500;background:transparent;border:1px solid transparent}
+.dock-w-subs a:hover{color:var(--tl);border-color:var(--bd)}
+.dock-w-subs a.on{background:var(--tlb);color:var(--tl);border-color:var(--tl)}
+.dock-w-parent-link{font-style:italic;color:var(--ft)!important}
+.dock-w-parent-link:hover{color:var(--tl)!important}
+
 .dock-m{grid-area:m;background:var(--bg);padding:18px 22px;overflow-y:auto}
 .dock-m>h1:first-child,.dock-m>header:first-child{margin-bottom:10px}
 
@@ -49,6 +65,13 @@ html,body{height:100vh;overflow:hidden;background:linear-gradient(135deg,#faf6f0
 .ix-shell:hover{background:var(--tlb);border-color:var(--tl)}
 
 .ix-lede{margin:10px 0 6px;color:var(--dm);font-size:12px;line-height:1.5}
+
+/* ─── main-dock view tabs (🏗️ UDTs | 🏷️ Tags) ─── */
+.ix-tabs{display:flex;gap:6px;margin:14px 0 8px;padding-bottom:8px;border-bottom:1px solid var(--bd)}
+.ix-tab{padding:6px 14px;border:1px solid var(--bd);border-radius:var(--r-sm);background:var(--card);color:var(--dm);font-family:var(--ff-body);font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.3px}
+.ix-tab:hover{border-color:var(--tl);color:var(--tl)}
+.ix-tab.on{background:var(--tlb);border-color:var(--tl);color:var(--tl)}
+.ix-pane[hidden]{display:none}
 
 .ix-nav{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 24px;padding-top:4px}
 .ix-pill{padding:5px 12px;border-radius:20px;background:var(--card);border:1px solid var(--bd);color:var(--dm);font-size:11px;font-weight:600;text-decoration:none;font-family:var(--ff-mono)}
