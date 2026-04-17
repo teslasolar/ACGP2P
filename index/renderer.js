@@ -29,10 +29,10 @@ export const SUBSYSTEMS=[
 ];
 
 const SHELL_LINKS=[
-  {href:'',                 label:'⚒ mesh'},
-  {href:'gateway-log.html', label:'⚠ log'},
-  {href:'health.html',      label:'⚕ health'},
-  {href:'#scada',           label:'🖥 scada drawer'},
+  {href:'',                                        label:'⚒ home'},
+  {href:'controls/hmi/chat/',                      label:'💬 chat'},
+  {href:'controls/scada/gateway/gateway-log.html', label:'⚠ log'},
+  {href:'controls/scada/gateway/health.html',      label:'⚕ health'},
 ];
 
 const HEARTBEAT_MS = 5000;

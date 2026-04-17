@@ -25,7 +25,8 @@ From any HMI page, the shortest relative path to `theme.css` is:
 
 | Page location                              | Path |
 |--------------------------------------------|------|
-| `/index.html`, `/health.html`, `/gateway-log.html` | `controls/scada/gateway/styles/theme.css` |
+| `/index.html` (landing)                             | `controls/scada/gateway/styles/theme.css` |
+| `/controls/scada/gateway/{gateway-log,health}.html` | `./styles/theme.css` |
 | `/controls/hmi/chat/index.html`             | `../../scada/gateway/styles/theme.css` |
 | `/controls/index.html`                      | `./scada/gateway/styles/theme.css` |
 | `/controls/{hmi,plc,db}/index.html`         | `../scada/gateway/styles/theme.css` |

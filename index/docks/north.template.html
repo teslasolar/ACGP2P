@@ -4,16 +4,16 @@
       <header class="dock-n"> … </header>
   Default contents:
     · glyph + name logo        (Source Serif, large)
-    · shell links              (mesh, log, health, scada drawer)
-    · live commit pill (via /js/version.js on the main chat page —
-                         subsystem pages just show basePath+'#')
+    · shell links              (home, chat, log, health)
+    · live commit pill (only on the /index.html landing, via
+                         /controls/scada/gateway/scripts/version.js)
 -->
 <header class="dock-n">
   <div class="dock-n-logo">{{GLYPH}} {{NAME}}<span>· ACG subsystem</span></div>
   <nav class="dock-n-shell">
-    <a href="{{BASE}}">⚒ mesh</a>
-    <a href="{{BASE}}gateway-log.html">⚠ log</a>
-    <a href="{{BASE}}health.html">⚕ health</a>
-    <a href="{{BASE}}#scada">🖥 scada drawer</a>
+    <a href="{{BASE}}">⚒ home</a>
+    <a href="{{BASE}}controls/hmi/chat/">💬 chat</a>
+    <a href="{{BASE}}controls/scada/gateway/gateway-log.html">⚠ log</a>
+    <a href="{{BASE}}controls/scada/gateway/health.html">⚕ health</a>
   </nav>
 </header>

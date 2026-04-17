@@ -37,7 +37,7 @@ const CONTROLS=[
    desc:'Tag plant + HMI monitor.  Owns sys.* and version.*.  Dense-token specs at /controls/scada/00-legend.json through 04-sandbox.json.',
    href:'scada/'},
   {id:'errors',   glyph:'⚠',  name:'Errors',   status:'ready',
-   desc:'Gateway-log ring buffer (N=200).  Owns errors.*.  Lives inside /controls/scada/ as the gateway area; viewer at /gateway-log.html.',
+   desc:'Gateway-log ring buffer (N=200).  Owns errors.*.  Lives inside /controls/scada/ as the gateway area; viewer at /controls/scada/gateway/gateway-log.html.',
    href:'scada/errors/'},
   {id:'hmi',      glyph:'🖼', name:'HMI',      status:'ready',
    desc:'ISA-101 operator interface: 5 screen layers (L1 Overview … L5 Support), semantic color palette, faceplate registry.  Owns hmi.*.',
@@ -70,9 +70,9 @@ docks.n.append(
   el('div',{class:'dock-n-logo'},['🎛 controls', el('span',{},' · control plane')]),
   el('nav',{class:'dock-n-shell'},[
     el('a',{href:basePath},'⚒ mesh'),
-    el('a',{href:basePath+'gateway-log.html'},'⚠ log'),
-    el('a',{href:basePath+'health.html'},'⚕ health'),
-    el('a',{href:basePath+'#scada'},'🖥 scada drawer'),
+    el('a',{href:basePath+'controls/scada/gateway/gateway-log.html'},'⚠ log'),
+    el('a',{href:basePath+'controls/scada/gateway/health.html'},'⚕ health'),
+    el('a',{href:basePath+'controls/hmi/chat/#scada'},'🖥 scada drawer'),
   ])
 );
 

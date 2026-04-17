@@ -5,9 +5,9 @@
 <a href="https://teslasolar.github.io/ACGP2P/"><img alt="chat"       src="https://img.shields.io/badge/⚒-open_chat-1a5c4c?style=for-the-badge&labelColor=faf6f0"></a>
 <a href="https://teslasolar.github.io/ACGP2P/sandbox/"><img alt="sandbox" src="https://img.shields.io/badge/🧪-sandbox-6f42c1?style=for-the-badge&labelColor=faf6f0"></a>
 <a href="https://teslasolar.github.io/ACGP2P/sandbox/web-llm/"><img alt="web-llm" src="https://img.shields.io/badge/🧠-web--llm-c47a20?style=for-the-badge&labelColor=faf6f0"></a>
-<a href="https://teslasolar.github.io/ACGP2P/gateway-log.html"><img alt="log" src="https://img.shields.io/badge/⚠-gateway_log-b85c5c?style=for-the-badge&labelColor=faf6f0"></a>
-<a href="https://teslasolar.github.io/ACGP2P/health.html"><img alt="health" src="https://img.shields.io/badge/⚕-health-4a8868?style=for-the-badge&labelColor=faf6f0"></a>
-<a href="https://teslasolar.github.io/ACGP2P/#scada"><img alt="scada" src="https://img.shields.io/badge/🖥️-scada-79c0ff?style=for-the-badge&labelColor=1c2128"></a>
+<a href="https://teslasolar.github.io/ACGP2P/controls/scada/gateway/gateway-log.html"><img alt="log" src="https://img.shields.io/badge/⚠-gateway_log-b85c5c?style=for-the-badge&labelColor=faf6f0"></a>
+<a href="https://teslasolar.github.io/ACGP2P/controls/scada/gateway/health.html"><img alt="health" src="https://img.shields.io/badge/⚕-health-4a8868?style=for-the-badge&labelColor=faf6f0"></a>
+<a href="https://teslasolar.github.io/ACGP2P/controls/hmi/chat/#scada"><img alt="scada" src="https://img.shields.io/badge/🖥️-scada-79c0ff?style=for-the-badge&labelColor=1c2128"></a>
 
 ![Pages](https://img.shields.io/github/deployments/teslasolar/ACGP2P/github-pages?label=pages&color=1a5c4c)
 ![Last commit](https://img.shields.io/github/last-commit/teslasolar/ACGP2P?label=last%20commit&color=1a5c4c)
@@ -104,9 +104,7 @@ flowchart LR
 
 ```
 ⚒ ACGP2P/
-├─ index.html            💬  main chat page
-├─ gateway-log.html      ⚠  Ignition-style log viewer (errors.*)
-├─ health.html           ⚕  tracker + STUN + GitHub-API health probe
+├─ index.html            🏠  operator dashboard / landing
 ├─ controls/             🎛  control-plane subsystems
 │   ├─ scada/              🖥️  owns sys.* version.* + dense manifests (§0—§4)
 │   │   ├─ 00-legend.json  …  04-sandbox.json       declarative specs

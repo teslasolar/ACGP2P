@@ -4,7 +4,7 @@
 #
 # Owns: errors.*
 # Browser runtime: /js/errors.js
-# Viewer page:     /gateway-log.html
+# Viewer page:     /controls/scada/gateway/gateway-log.html
 # Location:        /controls/scada/errors/  (SCADA gateway area)
 #
 # Ring-buffer-backed log.  Every entry hits both a fixed-size list tag

@@ -36,7 +36,7 @@ The SCADA gateway also hosts:
 - `controls/scada/errors/`  ⚠ — gateway log ring buffer (errors.*)
 
 `errors/` is *adjacent* (a peer of `gateway/`) rather than nested, so the
-gateway-log viewer at `/gateway-log.html` keeps its short module path.
+gateway-log viewer lives next to it at `/controls/scada/gateway/gateway-log.html`.
 
 ## Future modules under `gateway/`
 

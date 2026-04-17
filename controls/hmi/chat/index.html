@@ -3,20 +3,58 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>💬 chat · ACG</title>
-<link rel="stylesheet" href="../../scada/gateway/styles/section.css">
+<title>💬 Guild Chat · ACG P2P</title>
+<link rel="stylesheet" href="../../scada/gateway/styles/style.css">
 </head>
 <body>
-<main id="section"></main>
-<script type="module">
-import {renderSection} from '../../../index/renderer.js';
-renderSection({
-  sub:      'chat',
-  glyph:    '💬',
-  name:     'chat',
-  desc:     'P2P messaging — owns chat.*, room.*, tracker.*, peers.*, signal.*.  HMI screen under /controls/hmi/.  Provider auth/runtime in /controls/scada/gateway/scripts/{p2p,peers,chat}.js.',
-  basePath: '../../../'
-});
-</script>
+<div class="hd">
+  <h1>⚒ ACG P2P<span>· guild chat</span></h1>
+  <span class="bg t">WebRTC</span>
+  <span class="bg a" id="cBg">Connecting</span>
+  <a class="bg v" id="ver" href="https://github.com/teslasolar/ACGP2P" target="_blank" rel="noopener" title="loading…">⌖ …</a>
+  <a class="bg sc" href="../../../index.html" title="Back to the operator dashboard">⌂ Home</a>
+  <a class="bg sc" href="../../" title="Control plane · SCADA, alarms, routing (Ctrl+. toggles the SCADA drawer)">🎛 Controls</a>
+  <a class="bg sx" href="../../sandbox/index.html" title="Sandbox tools (WebLLM, …)">🧪 Sandbox</a>
+  <a class="bg lg" href="../../scada/gateway/gateway-log.html" title="Gateway log · errors.*">⚠ Log</a>
+  <a class="bg hc" href="../../scada/gateway/health.html" title="Health check · trackers, STUN, GitHub API">⚕ Health</a>
+  <a class="bg ix" href="../../../index/" title="Subsystem directory · one index page per subsystem">🗂 Directory</a>
+  <div class="ri">
+    <label>Room</label>
+    <input type="text" id="rIn" value="acg-guild">
+    <button class="bt p" id="jBtn">Join</button>
+  </div>
+  <div class="st">
+    <div class="si"><span class="dt try" id="dot"></span><span id="cTx">Connecting</span></div>
+    <div class="si">👥 <span class="sv" id="nP">1</span></div>
+    <div class="si" id="auth"></div>
+  </div>
+</div>
+<div class="mn">
+  <div class="pn" style="display:flex;flex-direction:column">
+    <div class="ph"><span class="ic t">💬</span>Guild Chat<span class="ct" id="mId">—</span></div>
+    <div class="ca" id="chat"></div>
+    <div class="cb">
+      <input type="text" id="cIn" placeholder="Type a message..." spellcheck="false">
+      <button class="bt p" id="sBtn">Send</button>
+    </div>
+    <div id="log"></div>
+  </div>
+  <div class="sb">
+    <div class="pn" style="flex:1">
+      <div class="ph"><span class="ic s">👥</span>Peers<span class="ct" id="pLb">1 online</span></div>
+      <div style="flex:1;overflow:hidden;display:flex;flex-direction:column"><div class="pl" id="pList"></div></div>
+    </div>
+    <div class="pn" style="flex:0 0 auto">
+      <div class="ib">
+        <h3>⚒ ACG ⚒</h3>
+        <p>Peer-to-peer guild chat. No server stores messages. Direct WebRTC via WebTorrent trackers with automatic fallback.</p>
+        <a href="https://aicraftspeopleguild.github.io" target="_blank">Visit Guild Site →</a>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="ftr"><span>⚒ AI Craftspeople Guild · P2P</span><span><a href="https://github.com/aicraftspeopleguild" target="_blank">github.com/aicraftspeopleguild</a></span></div>
+
+<script type="module" src="../../scada/gateway/scripts/main.js"></script>
 </body>
 </html>
