@@ -1,7 +1,8 @@
 import {$,esc,log} from './ui.js';
-import {OAUTH} from './config.js';
+import {OAUTH,myId,myNm,myEm} from './config.js';
 import {AUTH} from './scada/providers.js';
 import {mkUDT} from './scada/udt.js';
+import * as tags from './scada/tags.js';
 
 const KEY='acg.profile';
 const listeners=new Set();
@@ -133,21 +134,98 @@ async function handleRedirect(){
   }
 }
 
-/* ═══ UI ═══ */
+/* ═══ UI — consolidated auth dropdown ═══
+ * Renders a single <details> pill with every auth sub-provider:
+ *   📡 webrtc    — operator peer-id (always on; auto-login)
+ *   🌊 webtorrent — tracker state (live from tracker.* tags)
+ *   🎮 discord   — OAuth (signed in → chip + sign-out; else Sign in)
+ *   🐙 github    — OAuth (same)
+ *   🔎 google    — OIDC stub
+ * The open/closed state is preserved across repaints.
+ */
+function trackerPill(){
+  const st=(tags.read('tracker.state')||{}).value||'offline';
+  const cls=st==='connected'?'ok':st==='offline'||st==='failed'?'err':'wrn';
+  return{st,cls};
+}
+function trackerUrl(){
+  return(tags.read('tracker.current')||{}).value?.url||'—';
+}
+
+function authRow({provider,glyph,title,status,action}){
+  return `<div class="auth-row" data-provider="${esc(provider)}">
+    <span class="auth-ic">${glyph}</span>
+    <span class="auth-lb"><strong>${esc(title)}</strong><div class="auth-st">${status}</div></span>
+    <span class="auth-ac">${action||''}</span>
+  </div>`;
+}
+
+function oauthRow(provider,glyph,title,loginAction){
+  const me=profile&&profile.provider===provider?profile:null;
+  if(me){
+    return authRow({
+      provider,glyph,title,
+      status:`signed in as <code>${esc(me.username)}</code>`,
+      action:`<button class="auth-btn" data-action="logout">Sign out</button>`,
+    });
+  }
+  return authRow({
+    provider,glyph,title,
+    status:'not signed in',
+    action:`<button class="auth-btn" data-action="login-${esc(loginAction)}">Sign in</button>`,
+  });
+}
+
 function paint(){
   const host=$('auth');if(!host)return;
-  host.innerHTML='';
-  if(profile){
-    const chip=document.createElement('div');chip.className='usr';
-    chip.innerHTML=`<img src="${esc(profile.avatar)}" alt=""><span>${esc(profile.username)}</span><button class="bt g" id="lo">Sign out</button>`;
-    host.appendChild(chip);
-    $('lo').onclick=logout;
-  }else{
-    const gh=document.createElement('button');gh.className='bt g gh';gh.textContent='GitHub';gh.onclick=githubLogin;
-    const dc=document.createElement('button');dc.className='bt g dc';dc.textContent='Discord';dc.onclick=discordLogin;
-    host.append(gh,dc);
-  }
+
+  // preserve the dropdown open state
+  const prev=host.querySelector('.auth-drop');
+  const wasOpen=prev?prev.hasAttribute('open'):false;
+
+  const t=trackerPill();
+  const trackUrl=trackerUrl();
+  const hasUser=!!profile;
+
+  // summary: avatar + user name if signed in, else emoji + operator id
+  const sumInner=hasUser
+    ?`<img src="${esc(profile.avatar)}" alt=""><span>${esc(profile.username)}</span>`
+    :`<span class="auth-em">${esc(myEm)}</span><span>operator · <code style="font-family:var(--ff-mono)">${esc(myNm)}</code></span>`;
+
+  host.innerHTML=`
+<details class="auth-drop"${wasOpen?' open':''}>
+  <summary class="auth-sum">${sumInner}<span class="auth-caret">▾</span></summary>
+  <div class="auth-body">
+    ${authRow({
+      provider:'webrtc',glyph:'📡',title:'WebRTC',
+      status:`operator peer-id · <code>${esc(myId)}</code>`,
+      action:`<span class="auth-pill ok">logged in</span>`,
+    })}
+    ${authRow({
+      provider:'webtorrent',glyph:'🌊',title:'WebTorrent',
+      status:`tracker · <code>${esc(trackUrl)}</code>`,
+      action:`<span class="auth-pill ${t.cls}">${esc(t.st)}</span>`,
+    })}
+    <div class="auth-hr"></div>
+    ${oauthRow('discord','🎮','Discord','discord')}
+    ${oauthRow('github','🐙','GitHub','github')}
+    ${authRow({
+      provider:'google',glyph:'🔎',title:'Google',
+      status:'OIDC implicit · not wired yet',
+      action:`<span class="auth-pill muted">stub</span>`,
+    })}
+  </div>
+</details>`;
+
+  // wire click handlers
+  host.querySelector('[data-action="login-discord"]')?.addEventListener('click',discordLogin);
+  host.querySelector('[data-action="login-github"]')?.addEventListener('click',githubLogin);
+  host.querySelectorAll('[data-action="logout"]').forEach(b=>b.addEventListener('click',logout));
 }
+
+// Live repaint when tracker state flips (webtorrent row)
+tags.subscribe('tracker.state',paint);
+tags.subscribe('tracker.current',paint);
 
 export function startAuth(){
   paint();
