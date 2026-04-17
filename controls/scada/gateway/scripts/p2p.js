@@ -22,7 +22,10 @@ const reconnectAttempts=new Map();   // url -> count (for back-off)
 const pending=new Map();             // offer_id -> RTCPeerConnection
 
 const PENDING_TTL_MS=60000;
-const CONNECT_TIMEOUT_MS=6000;
+// Some public trackers (webtorrent.dev behind Cloudflare) routinely
+// take 5-10 s for the WSS handshake on a cold connection even when
+// they're healthy. Keep this generous so we don't flap.
+const CONNECT_TIMEOUT_MS=10000;
 const RECONNECT_BACKOFF_MS=[3000,6000,12000,30000,60000];
 // Stop retrying a URL after this many failed attempts in a row — keeps
 // the log readable when a tracker is permanently offline.
