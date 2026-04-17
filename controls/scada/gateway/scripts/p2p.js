@@ -183,7 +183,11 @@ export function connectTracker(url){
   catch(e){log('✗ '+url+' — '+e.message,'er');scheduleReconnect(url);return}
 
   sockets.set(url,sock);
-  publishTrackers();
+  // SHIELD the tag-plant reflect — if it throws we must still attach
+  // sock.onopen / onmessage / onclose. A missing UDT once caused every
+  // handler to be skipped; the socket would open silently and the page
+  // looked like "tracker not connecting". Keep wired first, reflect second.
+  try{publishTrackers()}catch(e){try{console.error('publishTrackers err',e)}catch(_){}}
 
   const toHandle=setTimeout(()=>{
     if(sock.readyState!==1){
@@ -197,7 +201,7 @@ export function connectTracker(url){
     reconnectAttempts.set(url,0);
     log('✓ '+url,'ok');
     addMsg(null,null,null,'✓ tracker '+url.split('/')[2]+' connected',true);
-    publishTrackers();
+    try{publishTrackers()}catch(e){try{console.error('publishTrackers err',e)}catch(_){}}
     try{await announceOn(sock)}
     catch(e){log('initial announce err '+url+': '+e.message,'er')}
   };
@@ -222,7 +226,7 @@ export function connectTracker(url){
     clearTimeout(toHandle);
     sockets.delete(url);
     startedOn.delete(url);
-    publishTrackers();
+    try{publishTrackers()}catch(e){try{console.error('publishTrackers err',e)}catch(_){}}
     if(!room)return;
     scheduleReconnect(url);
   };
