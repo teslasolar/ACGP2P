@@ -57,16 +57,16 @@ CREATE TABLE subsystems (
   host          TEXT,                  -- gateway host if module
   registered_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
-INSERT INTO "subsystems" VALUES('💬 chat','chat','controls/hmi/chat/','controls/hmi/chat/provider.py','controls/hmi/chat/udts.json','controls/hmi/chat/tags.json',NULL,'2026-04-17 18:24:22');
-INSERT INTO "subsystems" VALUES('🔑 auth','auth','controls/scada/gateway/auth/','controls/scada/gateway/auth/provider.py','controls/scada/gateway/auth/udts.json','controls/scada/gateway/auth/tags.json','controls/scada/gateway/','2026-04-17 18:24:22');
-INSERT INTO "subsystems" VALUES('📡 auth.webrtc','auth.webrtc','controls/scada/gateway/auth/webrtc/','controls/scada/gateway/auth/webrtc/provider.py','controls/scada/gateway/auth/webrtc/udts.json','controls/scada/gateway/auth/webrtc/tags.json',NULL,'2026-04-17 18:24:22');
-INSERT INTO "subsystems" VALUES('🌊 auth.webtorrent','auth.webtorrent','controls/scada/gateway/auth/webtorrent/','controls/scada/gateway/auth/webtorrent/provider.py','controls/scada/gateway/auth/webtorrent/udts.json','controls/scada/gateway/auth/webtorrent/tags.json',NULL,'2026-04-17 18:24:22');
-INSERT INTO "subsystems" VALUES('🖥️ scada','scada','controls/scada/','controls/scada/provider.py','controls/scada/udts.json','controls/scada/tags.json',NULL,'2026-04-17 18:24:22');
-INSERT INTO "subsystems" VALUES('⚠ errors','errors','controls/scada/errors/','controls/scada/errors/provider.py','controls/scada/errors/udts.json','controls/scada/errors/tags.json',NULL,'2026-04-17 18:24:22');
-INSERT INTO "subsystems" VALUES('🗄️ db','db','controls/db/',NULL,NULL,'controls/db/tags.json',NULL,'2026-04-17 18:24:22');
-INSERT INTO "subsystems" VALUES('🖼 hmi','hmi','controls/hmi/','controls/hmi/provider.py','controls/hmi/udts.json','controls/hmi/tags.json',NULL,'2026-04-17 18:24:22');
-INSERT INTO "subsystems" VALUES('🔧 plc','plc','controls/plc/','controls/plc/provider.py','controls/plc/udts.json','controls/plc/tags.json',NULL,'2026-04-17 18:24:22');
-INSERT INTO "subsystems" VALUES('🧪 sandbox','sandbox','controls/sandbox/','controls/sandbox/provider.py','controls/sandbox/udts.json','controls/sandbox/tags.json',NULL,'2026-04-17 18:24:22');
+INSERT INTO "subsystems" VALUES('💬 chat','chat','controls/hmi/chat/','controls/hmi/chat/provider.py','controls/hmi/chat/udts.json','controls/hmi/chat/tags.json',NULL,'2026-04-17 18:25:09');
+INSERT INTO "subsystems" VALUES('🔑 auth','auth','controls/scada/gateway/auth/','controls/scada/gateway/auth/provider.py','controls/scada/gateway/auth/udts.json','controls/scada/gateway/auth/tags.json','controls/scada/gateway/','2026-04-17 18:25:09');
+INSERT INTO "subsystems" VALUES('📡 auth.webrtc','auth.webrtc','controls/scada/gateway/auth/webrtc/','controls/scada/gateway/auth/webrtc/provider.py','controls/scada/gateway/auth/webrtc/udts.json','controls/scada/gateway/auth/webrtc/tags.json',NULL,'2026-04-17 18:25:09');
+INSERT INTO "subsystems" VALUES('🌊 auth.webtorrent','auth.webtorrent','controls/scada/gateway/auth/webtorrent/','controls/scada/gateway/auth/webtorrent/provider.py','controls/scada/gateway/auth/webtorrent/udts.json','controls/scada/gateway/auth/webtorrent/tags.json',NULL,'2026-04-17 18:25:09');
+INSERT INTO "subsystems" VALUES('🖥️ scada','scada','controls/scada/','controls/scada/provider.py','controls/scada/udts.json','controls/scada/tags.json',NULL,'2026-04-17 18:25:09');
+INSERT INTO "subsystems" VALUES('⚠ errors','errors','controls/scada/errors/','controls/scada/errors/provider.py','controls/scada/errors/udts.json','controls/scada/errors/tags.json',NULL,'2026-04-17 18:25:09');
+INSERT INTO "subsystems" VALUES('🗄️ db','db','controls/db/',NULL,NULL,'controls/db/tags.json',NULL,'2026-04-17 18:25:09');
+INSERT INTO "subsystems" VALUES('🖼 hmi','hmi','controls/hmi/','controls/hmi/provider.py','controls/hmi/udts.json','controls/hmi/tags.json',NULL,'2026-04-17 18:25:09');
+INSERT INTO "subsystems" VALUES('🔧 plc','plc','controls/plc/','controls/plc/provider.py','controls/plc/udts.json','controls/plc/tags.json',NULL,'2026-04-17 18:25:09');
+INSERT INTO "subsystems" VALUES('🧪 sandbox','sandbox','controls/sandbox/','controls/sandbox/provider.py','controls/sandbox/udts.json','controls/sandbox/tags.json',NULL,'2026-04-17 18:25:09');
 CREATE TABLE tags (
   id           INTEGER PRIMARY KEY AUTOINCREMENT,
   path         TEXT,                    -- exact path (one of)
