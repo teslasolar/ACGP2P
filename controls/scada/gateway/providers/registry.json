@@ -14,10 +14,12 @@
   "subsystems": [
     {
       "id": "💬 chat",
-      "dir": "chat/",
-      "provider": "chat/provider.py",
-      "udts": "chat/udts.json",
-      "tags": "chat/tags.json",
+      "dir": "controls/hmi/chat/",
+      "provider": "controls/hmi/chat/provider.py",
+      "udts": "controls/hmi/chat/udts.json",
+      "tags": "controls/hmi/chat/tags.json",
+      "templates": "controls/hmi/chat/templates/",
+      "screen": "controls/hmi/chat/index.html",
       "browser": ["controls/scada/gateway/scripts/config.js", "controls/scada/gateway/scripts/p2p.js", "controls/scada/gateway/scripts/peers.js", "controls/scada/gateway/scripts/chat.js"],
       "namespaces": ["chat", "room", "tracker", "peers", "signal"]
     },

@@ -2,7 +2,7 @@
   "§": "C.UDT",
   "🏗️": "💬",
   "name": "chat · UDTs",
-  "owner": "chat/provider.py",
+  "owner": "controls/hmi/chat/provider.py",
 
   "types": {
     "Peer": {

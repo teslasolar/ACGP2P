@@ -10,6 +10,7 @@ controls/
     gateway/         🛰  SCADA gateway host (loads modules)
       auth/          🔑  identity module · owns auth.* + sub-providers
   hmi/               🖼  ISA-101 operator interface: layers, palette, faceplates
+    chat/            💬  P2P chat screen · owns chat.* room.* tracker.* peers.* signal.*
   plc/               🔧  GitPLC universal PLC namespace + UDT templates (git/)
   sandbox/           🧪  browser-only tool workshops (web-llm, voice, VFS) · owns sandbox.*
   db/                🗄️  tags.json — canonical snapshot read by the README HMI
@@ -23,7 +24,7 @@ Siblings (future — room here for more):
 - `controls/routing/`      rule-based tag routing + transformations
 - `controls/pinning/`      "pinned tags" (persist across sessions)
 
-Every control subsystem follows the same contract as /chat
+Every control subsystem follows the standard provider contract
 (see `/index/README.md`): `provider.py` (Jython 2.7) + `udts.json` +
 `tags.json` + `index.html` → rendered via `/index/renderer.js`.
 

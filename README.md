@@ -107,9 +107,6 @@ flowchart LR
 ├─ index.html            💬  main chat page
 ├─ gateway-log.html      ⚠  Ignition-style log viewer (errors.*)
 ├─ health.html           ⚕  tracker + STUN + GitHub-API health probe
-├─ chat/                 💬  subsystem plant
-│   ├─ provider.py           owns chat.* room.* tracker.* peers.* signal.*
-│   ├─ udts.json   tags.json
 ├─ controls/             🎛  control-plane subsystems
 │   ├─ scada/              🖥️  owns sys.* version.* + dense manifests (§0—§4)
 │   │   ├─ 00-legend.json  …  04-sandbox.json       declarative specs
@@ -121,6 +118,7 @@ flowchart LR
 │   │       ├─ providers/      registry.json — canonical tag-provider registry
 │   │       └─ auth/       🔑  identity module · owns auth.* (webrtc/webtorrent/discord/github/google)
 │   ├─ hmi/                🖼  ISA-101 operator interface (layers, palette, faceplates)
+│   │   └─ chat/             💬  P2P chat HMI screen · owns chat.* room.* tracker.* peers.* signal.*
 │   ├─ plc/                🔧  GitPLC universal PLC namespace (git/ UDT templates)
 │   ├─ sandbox/            🧪  browser-only tools · owns sandbox.*
 │   │   └─ web-llm/          🧠 voice-powered in-browser LLM

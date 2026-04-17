@@ -8,11 +8,23 @@ other subsystems (SCADA tag plant, PLC equipment tree).
 
 ```
 hmi/
-  provider.py    Jython 2.7 tag provider
+  provider.py    Jython 2.7 tag provider · owns hmi.*
   udts.json      HMI UDT catalog (Faceplate, ScreenLayer, ColorMeaning, ...)
   tags.json      hmi.* tag catalog
   index.html     subsystem landing (via /index/renderer.js)
+  templates/     copy-and-fill faceplate / badge / layer library
+
+  chat/          💬  P2P chat HMI screen
+                  · owns chat.*, room.*, tracker.*, peers.*, signal.*
+                  · provider.py + udts.json + tags.json + templates/{wire,ui}
+                  · runtime in /controls/scada/gateway/scripts/{p2p,peers,chat}.js
 ```
+
+## Hosted screens
+
+Chat lives here as the first concrete HMI screen.  Future operator
+screens (alarm summary, batch monitor, recipe editor, trend grid) belong
+under `controls/hmi/<screen>/` and follow the same provider contract.
 
 ## ISA-101 layer model
 
