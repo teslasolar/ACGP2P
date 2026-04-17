@@ -24,6 +24,9 @@ const pending=new Map();             // offer_id -> RTCPeerConnection
 const PENDING_TTL_MS=60000;
 const CONNECT_TIMEOUT_MS=6000;
 const RECONNECT_BACKOFF_MS=[3000,6000,12000,30000,60000];
+// Stop retrying a URL after this many failed attempts in a row — keeps
+// the log readable when a tracker is permanently offline.
+const RECONNECT_GIVE_UP_AT=8;
 
 // ── utility ─────────────────────────────────────────────────────────
 async function mkHash(name){
@@ -177,10 +180,13 @@ export function connectTracker(url){
   if(existing&&(existing.readyState===0||existing.readyState===1))return;
 
   if(reconnectTimers.has(url)){clearTimeout(reconnectTimers.get(url));reconnectTimers.delete(url)}
-  log('trying: '+url,'hi');
+  // Quiet the log after a few retries so a dead tracker doesn't spam.
+  const attempts=reconnectAttempts.get(url)||0;
+  const verbose=attempts<3;
+  if(verbose)log('trying: '+url,'hi');
   let sock;
   try{sock=new WebSocket(url)}
-  catch(e){log('✗ '+url+' — '+e.message,'er');scheduleReconnect(url);return}
+  catch(e){if(verbose)log('✗ '+url+' — '+e.message,'er');scheduleReconnect(url);return}
 
   sockets.set(url,sock);
   // SHIELD the tag-plant reflect — if it throws we must still attach
@@ -191,7 +197,7 @@ export function connectTracker(url){
 
   const toHandle=setTimeout(()=>{
     if(sock.readyState!==1){
-      log('✗ '+url+' — connect timeout','er');
+      if(verbose)log('✗ '+url+' — connect timeout','er');
       try{sock.close()}catch(e){}
     }
   },CONNECT_TIMEOUT_MS);
@@ -235,8 +241,14 @@ export function connectTracker(url){
 function scheduleReconnect(url){
   const n=(reconnectAttempts.get(url)||0);
   reconnectAttempts.set(url,n+1);
+  if(n>=RECONNECT_GIVE_UP_AT){
+    // one final log, then stop. pm + already-open trackers keep working.
+    if(n===RECONNECT_GIVE_UP_AT)log('✗ '+url+' unreachable — giving up after '+n+' attempts','er');
+    return;
+  }
   const ms=RECONNECT_BACKOFF_MS[Math.min(n,RECONNECT_BACKOFF_MS.length-1)];
-  log('↻ '+url+' in '+(ms/1000)+'s','wr');
+  // log only the first few retries to keep the gateway-log readable
+  if(n<3)log('↻ '+url+' in '+(ms/1000)+'s','wr');
   reconnectTimers.set(url,setTimeout(()=>connectTracker(url),ms));
 }
 
