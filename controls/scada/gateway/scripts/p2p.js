@@ -18,6 +18,12 @@ const reconnectTimers=new Map();     // url -> setTimeout handle
 const reconnectAttempts=new Map();   // url -> count (for back-off)
 const pending=new Map();             // offer_id -> RTCPeerConnection
 
+// Shared offer batch for the current announce cycle. A late-joining
+// tracker re-uses this same batch instead of minting its own fresh
+// PCs, which keeps the steady-state pool tiny. Replaced every
+// periodic re-announce.
+let currentOffers=null;
+
 // Unanswered offers expire so we don't leak RTCPeerConnections — Chrome
 // caps at ~500 per document, and 10 offers per tracker per 30s gets
 // there fast if we never reap.
@@ -150,18 +156,36 @@ async function onAnswer(msg){
 }
 
 // ── announce fan-out ────────────────────────────────────────────────
+// One batch of offers per announce cycle, sent to every open tracker.
+// Late-joining trackers re-use the same batch via sendCurrentBatch().
+function announcePayload(offers,extra){
+  return JSON.stringify({
+    action:'announce',info_hash:hash,peer_id:myId,
+    numwant:50,uploaded:0,downloaded:0,left:1,offers,
+    ...extra,
+  });
+}
+
 export async function announce(){
   const opens=openSockets();
   if(!opens.length)return;
-  const offers=await mkOffers(N_OFFERS);
-  const payload=JSON.stringify({
-    action:'announce',info_hash:hash,peer_id:myId,
-    numwant:50,uploaded:0,downloaded:0,left:1,offers,
-  });
+  currentOffers=await mkOffers(N_OFFERS);
+  const payload=announcePayload(currentOffers);
   log('announcing '+N_OFFERS+' offers to '+opens.length+'/'+TRACKERS.length+' tracker(s)','hi');
   for(const s of opens){try{s.send(payload)}catch(e){}}
   TRACKER.inc('announces');
   TRACKER.write('lastAnnounceAt',Date.now(),{type:'DateTime'});
+}
+
+// Seed a newly-opened tracker. If there's already a batch, re-use it;
+// otherwise run a full announce() for this first tracker.
+async function seedTracker(sock){
+  if(!currentOffers){
+    await announce();
+    return;
+  }
+  if(sock.readyState!==1)return;
+  try{sock.send(announcePayload(currentOffers))}catch(e){}
 }
 
 // ── per-tracker connect with exponential-backoff reconnect ──────────
@@ -192,16 +216,11 @@ export function connectTracker(url){
     log('✓ '+url,'ok');
     addMsg(null,null,null,'✓ tracker '+url.split('/')[2]+' connected',true);
     publishTrackers();
-    // seed the new tracker with an offer batch so it discovers peers
-    try{
-      const offers=await mkOffers(N_OFFERS);
-      sock.send(JSON.stringify({
-        action:'announce',info_hash:hash,peer_id:myId,
-        numwant:50,uploaded:0,downloaded:0,left:1,offers,
-      }));
-      TRACKER.inc('announces');
-      TRACKER.write('lastAnnounceAt',Date.now(),{type:'DateTime'});
-    }catch(e){log('initial announce err '+url+': '+e.message,'er')}
+    // Seed using the shared offer batch. First opener triggers
+    // announce() (full batch mint); every later opener re-uses the
+    // same currentOffers and sends zero new PCs.
+    try{await seedTracker(sock)}
+    catch(e){log('seed err '+url+': '+e.message,'er')}
   };
 
   sock.onmessage=async e=>{
@@ -247,6 +266,7 @@ export async function join(rName){
   if(reTimer){clearTimeout(reTimer);reTimer=null}
   for(const[,pc]of pending)try{pc.close()}catch(e){}
   pending.clear();
+  currentOffers=null;
   for(const[,info]of pm)for(const dc of info.dcs)try{dc.close()}catch(e){}
   pm.clear();PEERS.clear();updPeers();
 

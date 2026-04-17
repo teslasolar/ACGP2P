@@ -2,60 +2,83 @@
   "§": "4.2.5",
   "🏗️": "🧰",
   "name": "mcp-tools-engine",
-  "module": "controls/sandbox/web-llm/modules/mcp-tools-engine.js",
-  "desc": "virtual filesystem + git-lite + fenced-LLM-tool parser/dispatcher",
+  "module":       "controls/sandbox/web-llm/modules/mcp-tools-engine.js",
+  "modules_split":[
+    "controls/sandbox/web-llm/modules/mcp/repo.js",
+    "controls/sandbox/web-llm/modules/mcp/vfs.js",
+    "controls/sandbox/web-llm/modules/mcp/git.js",
+    "controls/sandbox/web-llm/modules/mcp/preview.js",
+    "controls/sandbox/web-llm/modules/mcp/scaffold.js",
+    "controls/sandbox/web-llm/modules/mcp/tools.js"
+  ],
+  "udts": "controls/sandbox/web-llm/udts.json",
+  "tags": "controls/sandbox/web-llm/tags.json",
+  "desc": "Virtual filesystem + git-lite + previewer + scaffolds + fenced LLM-tool parser/dispatcher. The monolithic mcp-tools-engine.js is now a thin re-export shim; every concern lives in its own file under mcp/.",
 
   "📦": {
-    "repo": {
-      "name":    "s",
-      "branch":  "s",
-      "files":   "m path:s → { content:s, mtime:ms }",
-      "commits": "a [{ id:s7, message:s, timestamp:ms, snapshot:o }]",
-      "staged":  "m"
+    "repo (mcp/repo.js)": {
+      "name":        "s",
+      "branch":      "s",
+      "files":       "m path:s → { content:s, mtime:ms }",
+      "directories": "Set<s> (explicit mkdir targets)",
+      "commits":     "a [{ id:s7, message:s, ts:ms, branch:s, snapshot:o }]",
+      "branches":    "m name:s → { head:s7? }",
+      "staged":      "m (reserved)"
     }
   },
 
   "🏗️": {
-    "VFile":    { "path":"s", "type":"e[html|css|javascript|json|markdown|text|svg|other]", "size":"i", "mtime":"ms" },
-    "Commit":   { "id":"s7", "message":"s", "timestamp":"ms", "files":"i" },
-    "ToolCall": { "name":"e", "args":"o", "ok":"b", "result":"any", "ts":"ms" }
+    "VFile":           "path:s, type:e, size:i, mtime:ms",
+    "Directory":       "path:s, entries:a[s], fileCount:i, mtime:ms",
+    "FileTree":        "root:s, nodes:a[{path,type,size?}], fileCount:i",
+    "Commit":          "id:s7, message:s, ts:ms, files:i",
+    "Branch":          "name:s, head:s7?, commitCount:i",
+    "Status":          "clean:b, added:a[s], modified:a[s], deleted:a[s], commits:i",
+    "Diff":            "ref:s?, added:a[s], modified:a[s], deleted:a[s]",
+    "Preview":         "path:s, sizeBytes:i, inlined:a[{path,kind}], ts:ms",
+    "ExportArtifact":  "format:e[json|bundle], size:i, ts:ms",
+    "Scaffold":        "kind:e[vanilla|spa|markdown|canvas], files:a[s], entry:s?",
+    "ToolCall":        "name:s, args:o, ok:b, result:s?, ts:ms"
   },
 
-  "→fs": [
-    { "name": "createFile", "in": "path,content=''", "flow": "files.set ⊕ publish(create_file)" },
-    { "name": "editFile",   "in": "path,content",    "flow": "files.update ⊕ publish(edit_file) ∨ createFile if missing" },
-    { "name": "patchFile",  "in": "path,oldStr,newStr", "flow": "replace ⊕ publish(patch_file)" },
-    { "name": "readFile",   "in": "path",            "out": "{ok,content,type,size}" },
-    { "name": "deleteFile", "in": "path" },
-    { "name": "listFiles",  "in": "prefix='/'",      "out": "{count,files}" },
-    { "name": "searchFiles","in": "query",           "out": "{results,count}" },
-    { "name": "getAllFiles","out": "{path:content,…}" }
+  "→vfs (mcp/vfs.js)": [
+    "createFile(path,content?) · editFile(path,content) · patchFile(path,old,new)",
+    "deleteFile(path) · readFile(path) · listFiles(prefix='/') · searchFiles(query) · getAllFiles()",
+    "mkdir(path) · moveFile(from,to) · copyFile(from,to) · tree(prefix='/')"
   ],
 
-  "→git": [
-    { "name": "initRepo",       "in": "name",     "flow": "reset files+commits ⊕ publish(init_repo)" },
-    { "name": "commitChanges",  "in": "message",  "out": "{id,message}", "flow": "snapshot ⊕ unshift ⊕ publish(commit)" },
-    { "name": "getLog",         "in": "n=20",     "out": "{commits}" },
-    { "name": "getDiff",        "out": "{added,modified,deleted}" },
-    { "name": "checkout",       "in": "ref",      "flow": "restore snapshot" },
-    { "name": "getRepoState",   "out": "{name,branch,fileCount,files,commitCount}" }
+  "→git (mcp/git.js)": [
+    "initRepo(name) · commitChanges(msg) · getLog(n=20) · getDiff(ref?)",
+    "getStatus() · checkout(ref) · branch(name) · listBranches() · getRepoState()",
+    "exportRepo() · importRepo(json)"
   ],
 
-  "→preview": [
-    { "name": "getPreviewableFiles", "out": "{files:a[s]}" },
-    { "name": "getPreviewHTML",      "in": "path", "out": "{ok,html}", "flow": "inline same-folder <link css> and <script src> so iframe can run without a server" }
+  "→preview (mcp/preview.js)": [
+    "getPreviewableFiles() · getPreviewHTML(path)",
+    "getPreviewBlobUrl(path) · bundle(path)"
   ],
 
-  "→llm-tools": [
-    { "name": "parseToolCalls",        "in": "text:s", "out": "a[{name,args}]", "flow": "regex fenced: ```<verb> <arg>\\n<body>\\n```" },
-    { "name": "executeTool",           "in": "name,args",         "out": "result", "flow": "DISPATCH[name] ⊕ publish(tool_call)" },
-    { "name": "buildToolSystemPrompt", "out": "s", "flow": "describes create|edit|delete|patch|preview|commit|list|read|search fenced syntax" }
+  "→scaffold (mcp/scaffold.js)": [
+    "scaffold(kind) · SCAFFOLD_KINDS = [vanilla, spa, markdown, canvas]"
   ],
 
-  "⚡dispatch": ["create_file","edit_file","patch_file","delete_file","read_file","list_files","search_files","commit","preview"],
+  "→llm-tools (mcp/tools.js)": [
+    "parseToolCalls(text) · executeTool(name,args) · buildToolSystemPrompt()"
+  ],
 
-  "↑🛰️": [
-    "create_file","edit_file","patch_file","delete_file","init_repo","commit","checkout","tool_call"
+  "⚡dispatch": [
+    "create_file","edit_file","patch_file","delete_file","read_file","list_files","search_files",
+    "mkdir","mv","cp","tree",
+    "commit","status","diff","log","branch","checkout",
+    "preview","bundle",
+    "scaffold","export","import"
+  ],
+
+  "↑🛰️ (sandbox.web-llm via bridge)": [
+    "create_file","edit_file","patch_file","delete_file",
+    "mkdir","mv","cp","tree",
+    "init_repo","commit","status","diff","checkout","branch",
+    "preview","bundle","scaffold","export","import","tool_call"
   ],
   "和": true
 }
