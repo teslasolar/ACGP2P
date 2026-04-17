@@ -76,6 +76,7 @@ export function buildDockShell(root){
   return docks;
 }
 
+export {paintNorth, paintWest, paintEast, paintSouth, SHELL_LINKS};
 function paintNorth(host,{glyph,name,basePath}){
   host.append(el('div',{class:'dock-n-logo'},[glyph+' '+name, el('span',{},' · ACG subsystem')]));
   const shell=el('nav',{class:'dock-n-shell'},
