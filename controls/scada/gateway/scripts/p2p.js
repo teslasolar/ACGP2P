@@ -6,11 +6,14 @@ import {ROOM,TRACKER,SIGNAL,PEERS} from './scada/providers.js';
 import {mkUDT} from './scada/udt.js';
 
 // ═══ Multi-tracker signalling ════════════════════════════════════════
-// Peers on different trackers only find each other if BOTH peers are
-// connected to a common tracker.  So we connect to *every* tracker in
-// TRACKERS simultaneously and announce the same offer batch on each.
-// Individual tracker disconnects reconnect with exponential backoff.
-// Full room rejoin only happens when the user changes rooms.
+// We dial every tracker in TRACKERS simultaneously so peers on different
+// trackers still find each other. Each tracker gets its OWN fresh batch
+// of offers (unique offer_ids) so two peers on different trackers can
+// answer distinct offers without colliding on a shared id.
+//
+// With N_OFFERS=5 and 3 trackers, the initial pool is ≤15 PCs and a
+// 30 s re-announce + 60 s TTL caps the steady-state pool ≤ 30 PCs,
+// safely under Chrome's ~500 cap.
 
 let hash=null,room='',reTimer=null;
 const sockets=new Map();             // url -> WebSocket
@@ -18,15 +21,6 @@ const reconnectTimers=new Map();     // url -> setTimeout handle
 const reconnectAttempts=new Map();   // url -> count (for back-off)
 const pending=new Map();             // offer_id -> RTCPeerConnection
 
-// Shared offer batch for the current announce cycle. A late-joining
-// tracker re-uses this same batch instead of minting its own fresh
-// PCs, which keeps the steady-state pool tiny. Replaced every
-// periodic re-announce.
-let currentOffers=null;
-
-// Unanswered offers expire so we don't leak RTCPeerConnections — Chrome
-// caps at ~500 per document, and 10 offers per tracker per 30s gets
-// there fast if we never reap.
 const PENDING_TTL_MS=60000;
 const CONNECT_TIMEOUT_MS=6000;
 const RECONNECT_BACKOFF_MS=[3000,6000,12000,30000,60000];
@@ -36,34 +30,22 @@ async function mkHash(name){
   const buf=await crypto.subtle.digest('SHA-1',new TextEncoder().encode('acg:'+name));
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
-
 function urlIdx(url){return TRACKERS.indexOf(url)}
-
-function openSockets(){
-  const out=[];
-  for(const[,s]of sockets)if(s.readyState===1)out.push(s);
-  return out;
-}
-function openUrls(){
-  const out=[];
-  for(const[u,s]of sockets)if(s.readyState===1)out.push(u);
-  return out;
-}
+function openSockets(){const out=[];for(const[,s]of sockets)if(s.readyState===1)out.push(s);return out}
+function openUrls(){const out=[];for(const[u,s]of sockets)if(s.readyState===1)out.push(u);return out}
 
 // ── tag plant reflect ───────────────────────────────────────────────
 function publishTrackers(){
-  // per-URL tile
   for(const url of TRACKERS){
     const s=sockets.get(url);
     const state = !s                ? 'offline'
                 : s.readyState===0  ? 'connecting'
                 : s.readyState===1  ? 'connected'
-                : /* closing/closed */'offline';
+                : 'offline';
     TRACKER.write('trackers.'+urlIdx(url),mkUDT('TrackerEndpoint',{
       url,state,rttMs:null,lastAt:Date.now(),
     }));
   }
-  // overall
   const opens=openUrls();
   const overallState = opens.length ? 'connected'
                      : [...sockets.values()].some(s=>s.readyState===0) ? 'connecting'
@@ -86,7 +68,7 @@ function publishTrackers(){
        :'offline');
 }
 
-// ── ICE + offer generation (pooled; one batch is sent to every tracker)
+// ── ICE + offer generation ──────────────────────────────────────────
 function waitIce(pc,ms=4000){
   return new Promise(r=>{
     if(pc.iceGatheringState==='complete')return r();
@@ -95,28 +77,31 @@ function waitIce(pc,ms=4000){
   });
 }
 
+// Mint n offers in PARALLEL. With serial mkOffers + N_OFFERS=5 and a
+// 4 s ICE timeout each, we could take 20 s to announce — past most
+// WSS-tracker idle windows. Parallel gathers in ≤ 4 s total.
 export async function mkOffers(n){
-  const offers=[];
+  const tasks=[];
   for(let i=0;i<n;i++){
-    const oid=crypto.randomUUID();
-    const pc=new RTCPeerConnection(ICE);
-    const dc=pc.createDataChannel('acg',{ordered:true});
-    wire(dc,oid);
-    const offer=await pc.createOffer();
-    await pc.setLocalDescription(offer);
-    await waitIce(pc);
-    offers.push({offer_id:oid,offer:{type:'offer',sdp:pc.localDescription.sdp}});
-    pending.set(oid,pc);
-    // expire the PC if no answer arrives — first tracker to deliver an
-    // answer wins via onAnswer() which deletes from pending.
-    setTimeout(()=>{
-      if(!pending.has(oid))return;
-      pending.delete(oid);
-      const st=pc.connectionState;
-      if(st!=='connected'&&st!=='connecting')try{pc.close()}catch(e){}
-    },PENDING_TTL_MS);
+    tasks.push((async()=>{
+      const oid=crypto.randomUUID();
+      const pc=new RTCPeerConnection(ICE);
+      const dc=pc.createDataChannel('acg',{ordered:true});
+      wire(dc,oid);
+      const offer=await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      await waitIce(pc);
+      pending.set(oid,pc);
+      setTimeout(()=>{
+        if(!pending.has(oid))return;
+        pending.delete(oid);
+        const st=pc.connectionState;
+        if(st!=='connected'&&st!=='connecting')try{pc.close()}catch(e){}
+      },PENDING_TTL_MS);
+      return{offer_id:oid,offer:{type:'offer',sdp:pc.localDescription.sdp}};
+    })());
   }
-  return offers;
+  return Promise.all(tasks);
 }
 
 // ── offer/answer handlers ───────────────────────────────────────────
@@ -132,11 +117,10 @@ async function onOffer(msg,sock){
     const ans=await pc.createAnswer();
     await pc.setLocalDescription(ans);
     await waitIce(pc);
-    // reply on the same tracker that delivered the offer
     if(sock.readyState===1){
       sock.send(JSON.stringify({
         action:'announce',info_hash:hash,peer_id:myId,
-        to_peer_id:rid,answer:{type:'answer',sdp:pc.localDescription.sdp},offer_id:msg.offer_id
+        to_peer_id:rid,answer:{type:'answer',sdp:pc.localDescription.sdp},offer_id:msg.offer_id,
       }));
     }
     log('→ answer to '+rid.slice(-8),'ok');
@@ -147,50 +131,48 @@ async function onOffer(msg,sock){
 
 async function onAnswer(msg){
   const pc=pending.get(msg.offer_id);
-  if(!pc)return;  // unknown or already matched by another tracker
-  pending.delete(msg.offer_id);  // first tracker wins
+  if(!pc)return;
+  pending.delete(msg.offer_id);
   log('← answer for '+msg.offer_id.slice(0,8),'hi');
   SIGNAL.write('last',mkUDT('SignalEvent',{kind:'answer',dir:'in',offerId:msg.offer_id,ts:Date.now()}));
   SIGNAL.inc('answersIn');
   try{await pc.setRemoteDescription(msg.answer)}catch(e){log('answer err: '+e.message,'er')}
 }
 
-// ── announce fan-out ────────────────────────────────────────────────
-// One batch of offers per announce cycle, sent to every open tracker.
-// Late-joining trackers re-use the same batch via sendCurrentBatch().
-function announcePayload(offers,extra){
-  return JSON.stringify({
+// ── announce (per-tracker) ──────────────────────────────────────────
+// Each tracker gets its own fresh offer batch with unique offer_ids so
+// peers on different trackers can answer distinct offers without
+// colliding. Includes event:'started' on first announce per convention.
+const startedOn=new Set(); // urls we've done the 'started' announce on
+
+async function announceOn(sock){
+  if(sock.readyState!==1)return;
+  const url=[...sockets.entries()].find(([,s])=>s===sock)?.[0]||'';
+  const offers=await mkOffers(N_OFFERS);
+  const event=startedOn.has(url)?undefined:'started';
+  if(event)startedOn.add(url);
+  const payload={
     action:'announce',info_hash:hash,peer_id:myId,
     numwant:50,uploaded:0,downloaded:0,left:1,offers,
-    ...extra,
-  });
+  };
+  if(event)payload.event=event;
+  if(sock.readyState!==1)return;
+  try{sock.send(JSON.stringify(payload))}
+  catch(e){log('send err '+url+': '+e.message,'er');return}
+  TRACKER.inc('announces');
+  TRACKER.write('lastAnnounceAt',Date.now(),{type:'DateTime'});
+  log('→ announce '+N_OFFERS+' offers · '+(url.split('/')[2]||url),'hi');
 }
 
 export async function announce(){
   const opens=openSockets();
-  if(!opens.length)return;
-  currentOffers=await mkOffers(N_OFFERS);
-  const payload=announcePayload(currentOffers);
-  log('announcing '+N_OFFERS+' offers to '+opens.length+'/'+TRACKERS.length+' tracker(s)','hi');
-  for(const s of opens){try{s.send(payload)}catch(e){}}
-  TRACKER.inc('announces');
-  TRACKER.write('lastAnnounceAt',Date.now(),{type:'DateTime'});
-}
-
-// Seed a newly-opened tracker. If there's already a batch, re-use it;
-// otherwise run a full announce() for this first tracker.
-async function seedTracker(sock){
-  if(!currentOffers){
-    await announce();
-    return;
-  }
-  if(sock.readyState!==1)return;
-  try{sock.send(announcePayload(currentOffers))}catch(e){}
+  if(!opens.length){log('announce skipped — no open trackers','wr');return}
+  // fan out in parallel — each tracker gets its own fresh batch
+  await Promise.all(opens.map(s=>announceOn(s).catch(e=>log('announceOn err: '+e.message,'er'))));
 }
 
 // ── per-tracker connect with exponential-backoff reconnect ──────────
 export function connectTracker(url){
-  // don't double-dial if already connected/connecting
   const existing=sockets.get(url);
   if(existing&&(existing.readyState===0||existing.readyState===1))return;
 
@@ -216,16 +198,14 @@ export function connectTracker(url){
     log('✓ '+url,'ok');
     addMsg(null,null,null,'✓ tracker '+url.split('/')[2]+' connected',true);
     publishTrackers();
-    // Seed using the shared offer batch. First opener triggers
-    // announce() (full batch mint); every later opener re-uses the
-    // same currentOffers and sends zero new PCs.
-    try{await seedTracker(sock)}
-    catch(e){log('seed err '+url+': '+e.message,'er')}
+    try{await announceOn(sock)}
+    catch(e){log('initial announce err '+url+': '+e.message,'er')}
   };
 
   sock.onmessage=async e=>{
     try{
       const m=JSON.parse(e.data);
+      if(m['failure reason']){log('tracker '+url+' refused: '+m['failure reason'],'er');return}
       if(m.offer&&m.peer_id&&m.peer_id!==myId)await onOffer(m,sock);
       if(m.answer&&m.offer_id)await onAnswer(m);
       if(m.interval){
@@ -241,8 +221,9 @@ export function connectTracker(url){
   sock.onclose=()=>{
     clearTimeout(toHandle);
     sockets.delete(url);
+    startedOn.delete(url);
     publishTrackers();
-    if(!room)return;  // user left on purpose
+    if(!room)return;
     scheduleReconnect(url);
   };
 }
@@ -255,18 +236,17 @@ function scheduleReconnect(url){
   reconnectTimers.set(url,setTimeout(()=>connectTracker(url),ms));
 }
 
-// ── join: fan out to every tracker; no single-tracker fallback ──────
+// ── join: fan out to every tracker in parallel ──────────────────────
 export async function join(rName){
-  // tear down previous sockets, timers, and pending PCs
   for(const[,t]of reconnectTimers)clearTimeout(t);
   reconnectTimers.clear();
   reconnectAttempts.clear();
+  startedOn.clear();
   for(const[,s]of sockets){s.onclose=null;s.onerror=null;s.onmessage=null;try{s.close()}catch(e){}}
   sockets.clear();
   if(reTimer){clearTimeout(reTimer);reTimer=null}
   for(const[,pc]of pending)try{pc.close()}catch(e){}
   pending.clear();
-  currentOffers=null;
   for(const[,info]of pm)for(const dc of info.dcs)try{dc.close()}catch(e){}
   pm.clear();PEERS.clear();updPeers();
 
@@ -277,17 +257,13 @@ export async function join(rName){
   ROOM.write('name',rName);ROOM.write('hash',hash);ROOM.write('joinedAt',Date.now(),{type:'DateTime'});
   addMsg(null,null,null,'Joining '+rName+' via '+TRACKERS.length+' trackers…',true);
 
-  // fan out to EVERY tracker in parallel — peers find each other via
-  // the union of connected trackers instead of just one
   for(const url of TRACKERS)connectTracker(url);
 }
 
-// ── chat broadcast (unchanged) ──────────────────────────────────────
 export function bcast(msg){
   const d=JSON.stringify(msg);let n=0;
   for(const[,info]of pm)for(const dc of info.dcs)if(dc.readyState==='open'){try{dc.send(d);n++}catch(e){}}
   return n;
 }
 
-// ── status probes used by main.js + monitor ─────────────────────────
 export function wsReady(){return openSockets().length>0}
