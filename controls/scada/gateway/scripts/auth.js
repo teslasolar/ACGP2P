@@ -151,6 +151,14 @@ function trackerPill(){
 function trackerUrl(){
   return(tags.read('tracker.current')||{}).value?.url||'—';
 }
+function trackerSummary(){
+  const cur=(tags.read('tracker.current')||{}).value||{};
+  const n=(tags.read('tracker.count')||{}).value||0;
+  const total=cur.configuredCount||0;
+  if(!n)return 'no tracker open';
+  const primary=cur.url?cur.url.split('/')[2]:'';
+  return n+'/'+total+' trackers · primary <code>'+esc(primary)+'</code>';
+}
 
 function authRow({provider,glyph,title,status,action}){
   return `<div class="auth-row" data-provider="${esc(provider)}">
@@ -203,7 +211,7 @@ function paint(){
     })}
     ${authRow({
       provider:'webtorrent',glyph:'🌊',title:'WebTorrent',
-      status:`tracker · <code>${esc(trackUrl)}</code>`,
+      status:trackerSummary(),
       action:`<span class="auth-pill ${t.cls}">${esc(t.st)}</span>`,
     })}
     <div class="auth-hr"></div>
@@ -223,9 +231,10 @@ function paint(){
   host.querySelectorAll('[data-action="logout"]').forEach(b=>b.addEventListener('click',logout));
 }
 
-// Live repaint when tracker state flips (webtorrent row)
+// Live repaint when tracker state or count flips (webtorrent row)
 tags.subscribe('tracker.state',paint);
 tags.subscribe('tracker.current',paint);
+tags.subscribe('tracker.count',paint);
 
 export function startAuth(){
   paint();
